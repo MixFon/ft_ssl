@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		299DEDE226998D57004B60B1 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 299DEDE126998D57004B60B1 /* md5.c */; };
+		299DEDE626998EE6004B60B1 /* sha256.c in Sources */ = {isa = PBXBuildFile; fileRef = 299DEDE526998EE6004B60B1 /* sha256.c */; };
 		29A81D3926764CA400F08792 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 29A81D3826764CA400F08792 /* main.c */; };
 		29A81E1A2676517700F08792 /* ft_strncat.c in Sources */ = {isa = PBXBuildFile; fileRef = 29A81D432676517600F08792 /* ft_strncat.c */; };
 		29A81E1B2676517700F08792 /* ft_cop_str_left_or_right.c in Sources */ = {isa = PBXBuildFile; fileRef = 29A81D442676517600F08792 /* ft_cop_str_left_or_right.c */; };
@@ -129,6 +131,9 @@
 
 /* Begin PBXFileReference section */
 		299DEDDE269750BF004B60B1 /* ft_ssl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ft_ssl.h; sourceTree = "<group>"; };
+		299DEDE126998D57004B60B1 /* md5.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = md5.c; sourceTree = "<group>"; };
+		299DEDE426998EE6004B60B1 /* sha256.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sha256.h; sourceTree = "<group>"; };
+		299DEDE526998EE6004B60B1 /* sha256.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sha256.c; sourceTree = "<group>"; };
 		29A81D3526764CA400F08792 /* MD5 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MD5; sourceTree = BUILT_PRODUCTS_DIR; };
 		29A81D3826764CA400F08792 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		29A81D4126764F5D00F08792 /* md5.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
@@ -254,9 +259,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		299DEDEA26999005004B60B1 /* SHA256 */ = {
+			isa = PBXGroup;
+			children = (
+				299DEDE526998EE6004B60B1 /* sha256.c */,
+			);
+			path = SHA256;
+			sourceTree = "<group>";
+		};
 		29A81D2C26764CA400F08792 = {
 			isa = PBXGroup;
 			children = (
+				299DEDEA26999005004B60B1 /* SHA256 */,
 				29A81D422676517600F08792 /* libft */,
 				29A81D4026764F3C00F08792 /* include */,
 				29A81D3726764CA400F08792 /* MD5 */,
@@ -276,6 +290,7 @@
 			isa = PBXGroup;
 			children = (
 				29A81D3826764CA400F08792 /* main.c */,
+				299DEDE126998D57004B60B1 /* md5.c */,
 			);
 			path = MD5;
 			sourceTree = "<group>";
@@ -285,6 +300,7 @@
 			children = (
 				29A81D4126764F5D00F08792 /* md5.h */,
 				299DEDDE269750BF004B60B1 /* ft_ssl.h */,
+				299DEDE426998EE6004B60B1 /* sha256.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -531,6 +547,7 @@
 				29A81EB72676517E00F08792 /* ft_isprint.c in Sources */,
 				29A81ED72676517E00F08792 /* ft_memset_wchar.c in Sources */,
 				29A81E912676517E00F08792 /* ft_lstnew.c in Sources */,
+				299DEDE626998EE6004B60B1 /* sha256.c in Sources */,
 				29A81E8F2676517E00F08792 /* ft_put_percent.c in Sources */,
 				29A81EE52676517E00F08792 /* ft_put_hexadecimal.c in Sources */,
 				29A81E9C2676517E00F08792 /* ft_strclr.c in Sources */,
@@ -542,6 +559,7 @@
 				29A81EAD2676517E00F08792 /* ft_put_unsigned.c in Sources */,
 				29A81EA02676517E00F08792 /* ft_putnbr_fd.c in Sources */,
 				29A81ED12676517E00F08792 /* ft_create_new_lst_strchar.c in Sources */,
+				299DEDE226998D57004B60B1 /* md5.c in Sources */,
 				29A81EB22676517E00F08792 /* ft_un_itoa.c in Sources */,
 				29A81EA32676517E00F08792 /* ft_numwr.c in Sources */,
 				29A81E972676517E00F08792 /* ft_memcmp.c in Sources */,

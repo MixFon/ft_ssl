@@ -34,11 +34,14 @@ typedef struct  s_md
     t_uint      len;
     t_ulong     len_message;
     size_t      count_octets;
-    size_t      count_words;
     t_uint      hash[4];
     t_uint      vars[6];
     t_uint       f;
     void        (*stages[4])(t_uint *vars, int i);
 }               t_md;
+
+void    print_bits(t_uchar *str, size_t len);
+t_uchar *alg_md5(const t_uchar *data, t_uint count_octets);
+void    print_hash(const t_uchar *data, size_t len);
 
 #endif /* md5_h */

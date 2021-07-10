@@ -6,7 +6,7 @@ while [[ count -lt 10 ]]
 do
 	echo $count
 	str=$(echo $count | python3 test_one.py)
-	one=$(./ft_ssl $str)
+	one=$(./ft_ssl md5 -s $str)
 	two=$(md5 -q -s $str)
 	# echo "-----"
 	# echo $two
