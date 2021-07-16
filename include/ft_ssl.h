@@ -3,6 +3,11 @@
 
 #include <sys/stat.h>
 #include "md5.h"
+#include "sha256.h"
+#include "libft.h"
+
+# define UINT_MAX   0xFFFFFFFF
+# define MAX_LEN    0xFFFFFFFFFFFFFFFF
 
 # define P          0
 # define Q          1
@@ -20,7 +25,13 @@ typedef struct  s_ssl
     size_t      count_file_names;
     t_uchar     *hash;
     char        *name_algorithm;
+    size_t      len_message_oct;
 }               t_ssl;
 
+typedef union       u_elem
+{
+    unsigned int    i_elem;
+    unsigned char   c_elem[4];
+}                   t_elem;
 
 #endif /* ft_ssl_h */

@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include "md5.h"
-#include "libft.h"
+
 /*
 ** Заполнение массив белым шумом.
 */
@@ -44,12 +44,13 @@ void fill_arr_s(t_md *md)
 /*
 ** Инициализация начальными данными.
 */
-void init(t_md *md, const t_uchar *data, t_uint count_octets)
+void init(t_md *md, const t_uchar *data, size_t count_octets)
 {
 //    ft_printf("sizeof = %d\n", sizeof(t_md));
     ft_memset(md, 0, sizeof(t_md));
-    md->data = (t_uchar *)ft_strnew(count_octets);
-    ft_memcpy(md->data, data, count_octets);
+    //md->data = (t_uchar *)ft_strnew(count_octets);
+    //ft_memcpy(md->data, data, count_octets);
+    md->data = data;
     //md->data = (t_uchar*)ft_strdup((const char*)data);
     md->count_octets = count_octets;
     fill_arr_k(md);
@@ -59,11 +60,11 @@ void init(t_md *md, const t_uchar *data, t_uint count_octets)
 /*
 ** Освобождение памяти.
 */
-void deinit(t_md *md)
-{
-    if (md->data != NULL)
-        free(md->data);
-}
+//void deinit(t_md *md)
+//{
+//    if (md->data != NULL)
+//        free(md->data);
+//}
 
 void print_bits(t_uchar *str, size_t len)
 {
@@ -75,61 +76,6 @@ void print_bits(t_uchar *str, size_t len)
         i++;
     }
     ft_putendl("");
-}
-
-/*
-** Добавляет нули для выравнивания по длины сравнимой с 448 bit (56 oct).
-*/
-void add_zeros(t_md *md)
-{
-    size_t len = md->len;
-    int tail = len % SIZE_MD5;
-    int count_zeros = 0;
-    if (tail < 56)
-        count_zeros = 56 - tail;
-    else
-        count_zeros = SIZE_MD5 - tail + 56;
-    //ft_printf("md->len = %d\n", md->len);
-    //ft_printf("tail = %d\n", tail);
-    //ft_printf("count_zeros = %d\n", count_zeros);
-    md->count_octets = len + count_zeros + 8; // 8 октетов для хранения длины
-    t_uchar *zeros = (t_uchar*)ft_strnew(md->count_octets);
-    ft_memcpy(zeros, md->data, len + 1);
-    ft_strdel((char**)&md->data);
-    md->data = zeros;
-    //ft_printf("count_octets %d, count_words %d\n", md->count_octets, md->count_words);
-    //print_bits(md->data, md->count_octets);
-}
-
-/*
-** Выравнивание потока.
-*/
-void step_one(t_md *md)
-{
-    md->len = (t_uint)ft_strlen((const char*)md->data);
-    md->len_message = md->len * 8 % MAX_LEN;
-    //ft_printf("len oct = %d\n", md->len);
-    //ft_printf("len_message bit = %d\n", md->len_message);
-    t_uchar *temp =(t_uchar*)ft_strjoin((const char*)md->data, "a");
-    //temp[md->len - 1] = 0xa;
-    temp[md->len] = 0x80;
-    ft_strdel((char**)&md->data);
-    md->data = temp;
-    //print_bits(md->data, ft_strlen((const char *)md->data));
-    //ft_printf("%s\n", md->data);
-    //ft_printf("%d\n", ft_strlen((const char*)md->data));
-    //print_bits((t_uchar *)md->data, 64);
-    add_zeros(md);
-}
-
-/*
-** Добавление длины сообщения (в битах) Последнее слобо будет иметь 512 бит.
-** 8 вычитаем для отхода правого края сообщения на 8 октетов
-*/
-void step_two(t_md *md)
-{
-    ft_memcpy(md->data + md->count_octets - 8, &md->len_message, 8);
-    //print_bits(md->data, md->count_octets);
 }
 
 /*
@@ -179,10 +125,6 @@ void rounds(t_md *md, const int words)
     md->vars[D] = md->hash[D];
     md->vars[F] = 0;
     md->vars[G] = 0;
-    md->stages[0] = stage_one;
-    md->stages[1] = stage_two;
-    md->stages[2] = stage_three;
-    md->stages[3] = stage_four;
     for (int i = 0; i < SIZE_MD5; i++)
     {
         md->stages[i / LEN_HASH_MD5](md->vars, i);
@@ -198,9 +140,11 @@ void rounds(t_md *md, const int words)
     md->hash[D] += md->vars[D];
 }
 
-void print_hash(const t_uchar *data, size_t len)
+void print_hash(const t_uchar *data)
 {
-    for (size_t i = 0; i < len; i++)
+    int i = -1;
+    //for (size_t i = 0; i < len; i++)
+    while (data[++i] != '\0')
         ft_printf("%02x", data[i]);
     ft_putendl("");
 }
@@ -211,6 +155,10 @@ void print_hash(const t_uchar *data, size_t len)
 void step_four(t_md *md)
 {
     int words = 0;
+    md->stages[0] = stage_one;
+    md->stages[1] = stage_two;
+    md->stages[2] = stage_three;
+    md->stages[3] = stage_four;
     while (words < md->count_octets)
     {
         rounds(md, words);
@@ -224,29 +172,29 @@ void step_four(t_md *md)
 /*
 ** Создает строку - hash. Память выделяется динамически.
 */
-t_uchar *get_string_hash(t_md *md)
+t_uchar *get_string_hash(t_uint *hash, int len)
 {
     t_uchar *result;
     
-    result = (t_uchar*)ft_strnew(LEN_HASH_MD5);
-    for (int i = 0; i < LEN_HASH_MD5; i++)
-        result[i] = ((t_uchar *)md->hash)[i];
+    result = (t_uchar*)ft_strnew(len + 1);
+    for (int i = 0; i < len; i++)
+        result[i] = ((t_uchar *)hash)[i];
     return (result);
 }
 
-t_uchar *alg_md5(const t_uchar *data, t_uint count_octets)
+t_uchar *alg_md5(const t_uchar *data, size_t count_octets)
 {
     t_uchar *result;
     t_md md;
     
     init(&md, data, count_octets);
-    print_bits(md.data, md.count_octets);
+    //print_bits(md.data, md.count_octets);
     //step_one(&md);
     //step_two(&md);
     step_three(&md);
     step_four(&md);
-    result = get_string_hash(&md);
+    result = get_string_hash(md.hash, LEN_HASH_MD5);
     //print_hash(result, 16);
-    deinit(&md);
+    //deinit(&md);
     return (result);
 }

@@ -56,12 +56,24 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "sha256 /Users/mixfon/Downloads/anydesk.dmg"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "sha256 -s &quot;Hello&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "sha256 /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/temp"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "md5 -s Hello"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "md5 -r -s Hello"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
