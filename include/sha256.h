@@ -23,12 +23,12 @@ typedef unsigned long long  t_ulong;
 
 typedef struct  s_sha
 {
-    t_uchar     *data;
-    t_uint      arr_k[SIZE_SHA256];
-    t_uint      arr_s[SIZE_SHA256];
-    size_t      count_octets;
-    t_uint      hash[8];
-    t_uint      vars[8];
+    const t_uchar   *data;
+    t_uint          arr_k[SIZE_SHA256];
+    t_uint          arr_s[SIZE_SHA256];
+    size_t          count_octets;
+    t_uint          hash[8];
+    t_uint          vars[8];
 }               t_sha;
 
 void chenge_endian(t_uchar *data, size_t count_octets);

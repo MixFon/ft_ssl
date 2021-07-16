@@ -44,8 +44,9 @@ void init_hash_start_value(t_sha *sha)
 void init_sha256(t_sha *sha, const t_uchar *data, const size_t count_octets)
 {
     ft_memset(sha, 0, sizeof(t_sha));
-    sha->data = (t_uchar *)ft_strnew(count_octets);
-    ft_memcpy(sha->data, data, count_octets);
+    //sha->data = (t_uchar *)ft_strnew(count_octets);
+    //ft_memcpy(sha->data, data, count_octets);
+    sha->data = data;
     sha->count_octets = count_octets;
     //print_bits(sha->data, count_octets);
     init_hash_start_value(sha);
