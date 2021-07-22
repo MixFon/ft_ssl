@@ -46,25 +46,12 @@ void fill_arr_s(t_md *md)
 */
 void init(t_md *md, const t_uchar *data, size_t count_octets)
 {
-//    ft_printf("sizeof = %d\n", sizeof(t_md));
     ft_memset(md, 0, sizeof(t_md));
-    //md->data = (t_uchar *)ft_strnew(count_octets);
-    //ft_memcpy(md->data, data, count_octets);
     md->data = data;
-    //md->data = (t_uchar*)ft_strdup((const char*)data);
     md->count_octets = count_octets;
     fill_arr_k(md);
     fill_arr_s(md);
 }
-
-/*
-** Освобождение памяти.
-*/
-//void deinit(t_md *md)
-//{
-//    if (md->data != NULL)
-//        free(md->data);
-//}
 
 void print_bits(t_uchar *str, size_t len)
 {
@@ -140,21 +127,12 @@ void rounds(t_md *md, const int words)
     md->hash[D] += md->vars[D];
 }
 
-void print_hash(const t_uchar *data)
-{
-    int i = -1;
-    //for (size_t i = 0; i < len; i++)
-    while (data[++i] != '\0')
-        ft_printf("%02x", data[i]);
-    ft_putendl("");
-}
-
 /*
 ** Вычисления в цикле.
 */
 void step_four(t_md *md)
 {
-    int words = 0;
+    size_t words = 0;
     md->stages[0] = stage_one;
     md->stages[1] = stage_two;
     md->stages[2] = stage_three;
@@ -164,9 +142,6 @@ void step_four(t_md *md)
         rounds(md, words);
         words += SIZE_MD5;
     }
-    //print_bits((t_uchar *)md->hash, 16);
-    //ft_printf("\n{%d%d%d%d}\n", md->hash[A], md->hash[B], md->hash[C], md->hash[D]);
-    //print_hash(md);
 }
 
 /*
@@ -188,13 +163,8 @@ t_uchar *alg_md5(const t_uchar *data, size_t count_octets)
     t_md md;
     
     init(&md, data, count_octets);
-    //print_bits(md.data, md.count_octets);
-    //step_one(&md);
-    //step_two(&md);
     step_three(&md);
     step_four(&md);
     result = get_string_hash(md.hash, LEN_HASH_MD5);
-    //print_hash(result, 16);
-    //deinit(&md);
     return (result);
 }

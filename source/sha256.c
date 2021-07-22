@@ -29,6 +29,9 @@ void init_arr_k_sha256(t_sha *sha)
     ft_memcpy(sha->arr_k, temp, sizeof(t_uint) * SIZE_SHA256);
 }
 
+/*
+** Заполнение начального вектора.
+*/
 void init_hash_start_value(t_sha *sha)
 {
     sha->hash[0] = 0x6A09E667;
@@ -41,14 +44,14 @@ void init_hash_start_value(t_sha *sha)
     sha->hash[7] = 0x5BE0CD19;
 }
 
+/*
+** Инициализация структуры.
+*/
 void init_sha256(t_sha *sha, const t_uchar *data, const size_t count_octets)
 {
     ft_memset(sha, 0, sizeof(t_sha));
-    //sha->data = (t_uchar *)ft_strnew(count_octets);
-    //ft_memcpy(sha->data, data, count_octets);
     sha->data = data;
     sha->count_octets = count_octets;
-    //print_bits(sha->data, count_octets);
     init_hash_start_value(sha);
     init_arr_k_sha256(sha);
 }
@@ -77,11 +80,10 @@ t_uint rotate_right(t_uint elem, int count)
 }
 
 /*
-** Дополнительная обработка первых 16 слов.
+** Заполнение остальных 48 элементов на основе первых 16-ти.
 */
 void mix_data(t_uint *data)
 {
-    //print_bits((t_uchar *)data, 64);
     for (int i = 16; i < 64; i++)
     {
         t_uint elem = data[i - 15];
@@ -89,10 +91,12 @@ void mix_data(t_uint *data)
         elem = data[i - 2];
         t_uint s1 = rotate_right(elem, 17) ^ rotate_right(elem, 19) ^ (elem >> 10);
         data[i] = data[i - 16] + s0 + data[i - 7] + s1;
-        //ft_printf("data[%d] = %d\n", i, data[i]);
     }
 }
 
+/*
+** Одновление  хеша
+*/
 void update_hash(t_sha *sha)
 {
     sha->hash[0] += sha->vars[0];
@@ -106,18 +110,15 @@ void update_hash(t_sha *sha)
 }
 
 /*
-** Обработка одного слова.
+** Основной цикл в котором происходит работа над одним 512-ти битным словом.
 */
 void working_words(t_sha *sha, const size_t word)
 {
     t_uint data[256];
-    //t_uint *data = (t_uint *)(sha->data + word);
     ft_memset(data, 0, 256);
     ft_memcpy(data, sha->data + word, 64);
     init_vars(sha);
-    //print_bits((t_uchar *)data, 256);
     mix_data(data);
-    //print_bits((t_uchar *)data, 256);
     for (int i = 0; i < SIZE_SHA256; i++)
     {
         t_uint teta0 = rotate_right(sha->vars[A_], 2) ^ rotate_right(sha->vars[A_], 13) ^ rotate_right(sha->vars[A_], 22);
@@ -136,7 +137,6 @@ void working_words(t_sha *sha, const size_t word)
         sha->vars[A_] = t1 + t2;
     }
     update_hash(sha);
-    //print_bits((t_uchar *)sha->hash, 32);
 }
 
 /*

@@ -2,15 +2,15 @@
 
 count=0
 
-while [[ count -lt 10 ]]
+while [[ count -lt 30 ]]
 do
 	echo $count
-	str=$(echo $count | python3 test_one.py)
-	one=$(./ft_ssl md5 -s $str)
+	str=$(echo $count | python3 generate_string.py)
+	one=$(./ft_ssl md5 -q -s $str)
 	two=$(md5 -q -s $str)
 	# echo "-----"
-	# echo $two
 	# echo $one
+	# echo $two
 	if [ "$one" = "$two" ]
 	then
 		echo "Yes"
