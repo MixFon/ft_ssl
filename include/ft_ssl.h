@@ -26,6 +26,8 @@ typedef struct  s_ssl
     t_uchar     *hash;
     char        *name_algorithm;
     size_t      len_message_oct;
+	int			i;
+	int			k;
 }               t_ssl;
 
 typedef union       u_elem

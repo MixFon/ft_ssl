@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		299DEDE226998D57004B60B1 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 299DEDE126998D57004B60B1 /* md5.c */; };
-		299DEDE626998EE6004B60B1 /* sha256.c in Sources */ = {isa = PBXBuildFile; fileRef = 299DEDE526998EE6004B60B1 /* sha256.c */; };
-		29A81D3926764CA400F08792 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 29A81D3826764CA400F08792 /* main.c */; };
+		297D114F26A953150005932F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 297D114B26A953150005932F /* main.c */; };
+		297D115026A953150005932F /* new_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 297D114C26A953150005932F /* new_main.c */; };
+		297D115126A953150005932F /* sha256.c in Sources */ = {isa = PBXBuildFile; fileRef = 297D114D26A953150005932F /* sha256.c */; };
+		297D115226A953150005932F /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 297D114E26A953150005932F /* md5.c */; };
 		29A81E1A2676517700F08792 /* ft_strncat.c in Sources */ = {isa = PBXBuildFile; fileRef = 29A81D432676517600F08792 /* ft_strncat.c */; };
 		29A81E1B2676517700F08792 /* ft_cop_str_left_or_right.c in Sources */ = {isa = PBXBuildFile; fileRef = 29A81D442676517600F08792 /* ft_cop_str_left_or_right.c */; };
 		29A81E1C2676517700F08792 /* ft_strdup_wchar.c in Sources */ = {isa = PBXBuildFile; fileRef = 29A81D452676517600F08792 /* ft_strdup_wchar.c */; };
@@ -130,12 +131,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		297D114A26A953150005932F /* replace_space_to_tab.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = replace_space_to_tab.py; sourceTree = "<group>"; };
+		297D114B26A953150005932F /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		297D114C26A953150005932F /* new_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = new_main.c; sourceTree = "<group>"; };
+		297D114D26A953150005932F /* sha256.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha256.c; sourceTree = "<group>"; };
+		297D114E26A953150005932F /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md5.c; sourceTree = "<group>"; };
 		299DEDDE269750BF004B60B1 /* ft_ssl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ft_ssl.h; sourceTree = "<group>"; };
-		299DEDE126998D57004B60B1 /* md5.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = md5.c; sourceTree = "<group>"; };
 		299DEDE426998EE6004B60B1 /* sha256.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sha256.h; sourceTree = "<group>"; };
-		299DEDE526998EE6004B60B1 /* sha256.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sha256.c; sourceTree = "<group>"; };
 		29A81D3526764CA400F08792 /* MD5 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MD5; sourceTree = BUILT_PRODUCTS_DIR; };
-		29A81D3826764CA400F08792 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		29A81D4126764F5D00F08792 /* md5.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
 		29A81D432676517600F08792 /* ft_strncat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ft_strncat.c; sourceTree = "<group>"; };
 		29A81D442676517600F08792 /* ft_cop_str_left_or_right.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ft_cop_str_left_or_right.c; sourceTree = "<group>"; };
@@ -259,21 +262,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		299DEDEA26999005004B60B1 /* SHA256 */ = {
+		297D114926A953150005932F /* source */ = {
 			isa = PBXGroup;
 			children = (
-				299DEDE526998EE6004B60B1 /* sha256.c */,
+				297D114A26A953150005932F /* replace_space_to_tab.py */,
+				297D114B26A953150005932F /* main.c */,
+				297D114C26A953150005932F /* new_main.c */,
+				297D114D26A953150005932F /* sha256.c */,
+				297D114E26A953150005932F /* md5.c */,
 			);
-			path = SHA256;
+			path = source;
 			sourceTree = "<group>";
 		};
 		29A81D2C26764CA400F08792 = {
 			isa = PBXGroup;
 			children = (
-				299DEDEA26999005004B60B1 /* SHA256 */,
+				297D114926A953150005932F /* source */,
 				29A81D422676517600F08792 /* libft */,
 				29A81D4026764F3C00F08792 /* include */,
-				29A81D3726764CA400F08792 /* MD5 */,
 				29A81D3626764CA400F08792 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -284,15 +290,6 @@
 				29A81D3526764CA400F08792 /* MD5 */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		29A81D3726764CA400F08792 /* MD5 */ = {
-			isa = PBXGroup;
-			children = (
-				29A81D3826764CA400F08792 /* main.c */,
-				299DEDE126998D57004B60B1 /* md5.c */,
-			);
-			path = MD5;
 			sourceTree = "<group>";
 		};
 		29A81D4026764F3C00F08792 /* include */ = {
@@ -479,6 +476,7 @@
 			files = (
 				29A81ED42676517E00F08792 /* ft_strnew.c in Sources */,
 				29A81EEA2676517E00F08792 /* ft_strcmp.c in Sources */,
+				297D115026A953150005932F /* new_main.c in Sources */,
 				29A81EA42676517E00F08792 /* ft_check_un_dimension.c in Sources */,
 				29A81EE12676517E00F08792 /* ft_lstdelone.c in Sources */,
 				29A81EE32676517E00F08792 /* ft_striter.c in Sources */,
@@ -506,7 +504,6 @@
 				29A81EBA2676517E00F08792 /* ft_strdel.c in Sources */,
 				29A81EA12676517E00F08792 /* ft_putstr_wchar.c in Sources */,
 				29A81ED02676517E00F08792 /* ft_memdel.c in Sources */,
-				29A81D3926764CA400F08792 /* main.c in Sources */,
 				29A81EDA2676517E00F08792 /* ft_float_inf.c in Sources */,
 				29A81E922676517E00F08792 /* type_float2.c in Sources */,
 				29A81EE62676517E00F08792 /* ft_strsub.c in Sources */,
@@ -518,6 +515,7 @@
 				29A81EA62676517E00F08792 /* ft_copy_string_right_wchar.c in Sources */,
 				29A81EEB2676517E00F08792 /* ft_multi_strdup.c in Sources */,
 				29A81EDB2676517E00F08792 /* ft_strdup.c in Sources */,
+				297D115226A953150005932F /* md5.c in Sources */,
 				29A81ECD2676517E00F08792 /* ft_strcl.c in Sources */,
 				29A81EBE2676517E00F08792 /* ft_toupper.c in Sources */,
 				29A81EC72676517E00F08792 /* ft_memset.c in Sources */,
@@ -547,7 +545,7 @@
 				29A81EB72676517E00F08792 /* ft_isprint.c in Sources */,
 				29A81ED72676517E00F08792 /* ft_memset_wchar.c in Sources */,
 				29A81E912676517E00F08792 /* ft_lstnew.c in Sources */,
-				299DEDE626998EE6004B60B1 /* sha256.c in Sources */,
+				297D115126A953150005932F /* sha256.c in Sources */,
 				29A81E8F2676517E00F08792 /* ft_put_percent.c in Sources */,
 				29A81EE52676517E00F08792 /* ft_put_hexadecimal.c in Sources */,
 				29A81E9C2676517E00F08792 /* ft_strclr.c in Sources */,
@@ -555,11 +553,11 @@
 				29A81E942676517E00F08792 /* ft_strlen.c in Sources */,
 				29A81EBF2676517E00F08792 /* ft_putchar.c in Sources */,
 				29A81E8B2676517E00F08792 /* ft_putstr_fd.c in Sources */,
+				297D114F26A953150005932F /* main.c in Sources */,
 				29A81E1B2676517700F08792 /* ft_cop_str_left_or_right.c in Sources */,
 				29A81EAD2676517E00F08792 /* ft_put_unsigned.c in Sources */,
 				29A81EA02676517E00F08792 /* ft_putnbr_fd.c in Sources */,
 				29A81ED12676517E00F08792 /* ft_create_new_lst_strchar.c in Sources */,
-				299DEDE226998D57004B60B1 /* md5.c in Sources */,
 				29A81EB22676517E00F08792 /* ft_un_itoa.c in Sources */,
 				29A81EA32676517E00F08792 /* ft_numwr.c in Sources */,
 				29A81E972676517E00F08792 /* ft_memcmp.c in Sources */,
