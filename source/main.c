@@ -463,13 +463,6 @@ int	main(int ac, const char *av[])
 {
 	t_ssl	ssl;
 
-	int i = 0;
-	while (++i < 10)
-	{
-		char *temp = ft_strnew(10);
-		temp = NULL;
-		ft_printf("Hello");
-	}
 	init_ssl(&ssl);
 	check_name_algorithm(&ssl, ac, av);
 	fill_flags(&ssl, ac, av);

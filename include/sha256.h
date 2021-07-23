@@ -31,6 +31,11 @@ typedef struct      s_sha
     t_uint          vars[8];
 }                   t_sha;
 
+enum e_var
+{
+	teta0, teta1, ch, ma, t1, t2
+};
+
 void chenge_endian(t_uchar *data, size_t count_octets);
 void print_bits(t_uchar *str, size_t len);
 t_uchar *get_string_hash(t_uint *hash, int len);

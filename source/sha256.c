@@ -1,15 +1,8 @@
-//
-//  sha256.c
-//  MD5
-//
-//  Created by Михаил Фокин on 10.07.2021.
-//
-
 #include "sha256.h"
 
-void init_arr_k_sha256(t_sha *sha)
+void	init_arr_k_sha256(t_sha *sha)
 {
-    t_uint temp[] = {
+	static t_uint	temp[] = {
 		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 		0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 		0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -26,142 +19,163 @@ void init_arr_k_sha256(t_sha *sha)
 		0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
 		0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
 		0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
-    ft_memcpy(sha->arr_k, temp, sizeof(t_uint) * SIZE_SHA256);
+
+	ft_memcpy(sha->arr_k, temp, sizeof(t_uint) * SIZE_SHA256);
 }
 
 /*
 ** Заполнение начального вектора.
 */
-void init_hash_start_value(t_sha *sha)
+void	init_hash_start_value(t_sha *sha)
 {
-    sha->hash[0] = 0x6A09E667;
-    sha->hash[1] = 0xBB67AE85;
-    sha->hash[2] = 0x3C6EF372;
-    sha->hash[3] = 0xA54FF53A;
-    sha->hash[4] = 0x510E527F;
-    sha->hash[5] = 0x9B05688C;
-    sha->hash[6] = 0x1F83D9AB;
-    sha->hash[7] = 0x5BE0CD19;
+	sha->hash[0] = 0x6A09E667;
+	sha->hash[1] = 0xBB67AE85;
+	sha->hash[2] = 0x3C6EF372;
+	sha->hash[3] = 0xA54FF53A;
+	sha->hash[4] = 0x510E527F;
+	sha->hash[5] = 0x9B05688C;
+	sha->hash[6] = 0x1F83D9AB;
+	sha->hash[7] = 0x5BE0CD19;
 }
 
 /*
 ** Инициализация структуры.
 */
-void init_sha256(t_sha *sha, const t_uchar *data, const size_t count_octets)
+void	init_sha256(t_sha *sha, const t_uchar *data, const size_t count_octets)
 {
-    ft_memset(sha, 0, sizeof(t_sha));
-    sha->data = data;
-    sha->count_octets = count_octets;
-    init_hash_start_value(sha);
-    init_arr_k_sha256(sha);
+	ft_memset(sha, 0, sizeof(t_sha));
+	sha->data = data;
+	sha->count_octets = count_octets;
+	init_hash_start_value(sha);
+	init_arr_k_sha256(sha);
 }
 
 /*
 ** Инициализация временных переменных стартовыми значениями.
 */
-void init_vars(t_sha *sha)
+void	init_vars(t_sha *sha)
 {
-    sha->vars[0] = sha->hash[0];
-    sha->vars[1] = sha->hash[1];
-    sha->vars[2] = sha->hash[2];
-    sha->vars[3] = sha->hash[3];
-    sha->vars[4] = sha->hash[4];
-    sha->vars[5] = sha->hash[5];
-    sha->vars[6] = sha->hash[6];
-    sha->vars[7] = sha->hash[7];
+	sha->vars[0] = sha->hash[0];
+	sha->vars[1] = sha->hash[1];
+	sha->vars[2] = sha->hash[2];
+	sha->vars[3] = sha->hash[3];
+	sha->vars[4] = sha->hash[4];
+	sha->vars[5] = sha->hash[5];
+	sha->vars[6] = sha->hash[6];
+	sha->vars[7] = sha->hash[7];
 }
 
 /*
 ** Циклический сдвиг вправо.
 */
-t_uint rotate_right(t_uint elem, int count)
+t_uint	rotate_right(t_uint elem, int count)
 {
-    return ((elem >> count) | (elem << (32 - count)));
+	return ((elem >> count) | (elem << (32 - count)));
 }
 
 /*
 ** Заполнение остальных 48 элементов на основе первых 16-ти.
 */
-void mix_data(t_uint *data)
+void	mix_data(t_uint *data)
 {
-    for (int i = 16; i < 64; i++)
-    {
-        t_uint elem = data[i - 15];
-        t_uint s0 = rotate_right(elem, 7) ^ rotate_right(elem, 18) ^ (elem >> 3);
-        elem = data[i - 2];
-        t_uint s1 = rotate_right(elem, 17) ^ rotate_right(elem, 19) ^ (elem >> 10);
-        data[i] = data[i - 16] + s0 + data[i - 7] + s1;
-    }
+	t_uint	elem;
+	t_uint	s0;
+	t_uint	s1;
+	int		i;
+
+	i = 15;
+	while (++i < 64)
+	{
+		elem = data[i - 15];
+		s0 = rotate_right(elem, 7) ^ rotate_right(elem, 18) ^ (elem >> 3);
+		elem = data[i - 2];
+		s1 = rotate_right(elem, 17) ^ rotate_right(elem, 19) ^ (elem >> 10);
+		data[i] = data[i - 16] + s0 + data[i - 7] + s1;
+	}
 }
 
 /*
 ** Одновление  хеша
 */
-void update_hash(t_sha *sha)
+void	update_hash(t_sha *sha)
 {
-    sha->hash[0] += sha->vars[0];
-    sha->hash[1] += sha->vars[1];
-    sha->hash[2] += sha->vars[2];
-    sha->hash[3] += sha->vars[3];
-    sha->hash[4] += sha->vars[4];
-    sha->hash[5] += sha->vars[5];
-    sha->hash[6] += sha->vars[6];
-    sha->hash[7] += sha->vars[7];
+	sha->hash[0] += sha->vars[0];
+	sha->hash[1] += sha->vars[1];
+	sha->hash[2] += sha->vars[2];
+	sha->hash[3] += sha->vars[3];
+	sha->hash[4] += sha->vars[4];
+	sha->hash[5] += sha->vars[5];
+	sha->hash[6] += sha->vars[6];
+	sha->hash[7] += sha->vars[7];
+}
+
+void	assigning_variables(t_sha *sha, t_uint *vars)
+{
+	sha->vars[H_] = sha->vars[G_];
+	sha->vars[G_] = sha->vars[F_];
+	sha->vars[F_] = sha->vars[E_];
+	sha->vars[E_] = sha->vars[D_] + vars[t1];
+	sha->vars[D_] = sha->vars[C_];
+	sha->vars[C_] = sha->vars[B_];
+	sha->vars[B_] = sha->vars[A_];
+	sha->vars[A_] = vars[t1] + vars[t2];
 }
 
 /*
 ** Основной цикл в котором происходит работа над одним 512-ти битным словом.
 */
-void working_words(t_sha *sha, const size_t word)
+void	working_words(t_sha *sha, const size_t word)
 {
-    t_uint data[256];
-    ft_memset(data, 0, 256);
-    ft_memcpy(data, sha->data + word, 64);
-    init_vars(sha);
-    mix_data(data);
-    for (int i = 0; i < SIZE_SHA256; i++)
-    {
-        t_uint teta0 = rotate_right(sha->vars[A_], 2) ^ rotate_right(sha->vars[A_], 13) ^ rotate_right(sha->vars[A_], 22);
-        t_uint ma = (sha->vars[A_] & sha->vars[B_]) ^ (sha->vars[A_] & sha->vars[C_]) ^ (sha->vars[B_] & sha->vars[C_]);
-        t_uint t2 = teta0 + ma;
-        t_uint teta1 = rotate_right(sha->vars[E_], 6) ^ rotate_right(sha->vars[E_], 11) ^ rotate_right(sha->vars[E_], 25);
-        t_uint ch = (sha->vars[E_] & sha->vars[F_]) ^ ((~sha->vars[E_]) & sha->vars[G_]);
-        t_uint t1 = sha->vars[H_] + teta1 + ch + sha->arr_k[i] + data[i];
-        sha->vars[H_] = sha->vars[G_];
-        sha->vars[G_] = sha->vars[F_];
-        sha->vars[F_] = sha->vars[E_];
-        sha->vars[E_] = sha->vars[D_] + t1;
-        sha->vars[D_] = sha->vars[C_];
-        sha->vars[C_] = sha->vars[B_];
-        sha->vars[B_] = sha->vars[A_];
-        sha->vars[A_] = t1 + t2;
-    }
-    update_hash(sha);
+	int		i;
+	t_uint	data[256];
+	t_uint	vars[6];
+
+	i = -1;
+	ft_memset(data, 0, 256);
+	ft_memcpy(data, sha->data + word, 64);
+	init_vars(sha);
+	mix_data(data);
+	while (++i < SIZE_SHA256)
+	{
+		vars[teta0] = rotate_right(sha->vars[A_], 2)
+			^ rotate_right(sha->vars[A_], 13) ^ rotate_right(sha->vars[A_], 22);
+		vars[ma] = (sha->vars[A_] & sha->vars[B_])
+			^ (sha->vars[A_] & sha->vars[C_]) ^ (sha->vars[B_] & sha->vars[C_]);
+		vars[t2] = vars[teta0] + vars[ma];
+		vars[teta1] = rotate_right(sha->vars[E_], 6)
+			^ rotate_right(sha->vars[E_], 11) ^ rotate_right(sha->vars[E_], 25);
+		vars[ch] = (sha->vars[E_] & sha->vars[F_])
+			^ ((~sha->vars[E_]) & sha->vars[G_]);
+		vars[t1] = sha->vars[H_] + vars[teta1]
+			+ vars[ch] + sha->arr_k[i] + data[i];
+		assigning_variables(sha, vars);
+	}
+	update_hash(sha);
 }
 
 /*
 ** Разбиение массива данных на слова по 512 бит (64 октета).
 */
-void working_sha256(t_sha *sha)
+void	working_sha256(t_sha *sha)
 {
-    size_t word;
-    
-    word = 0;
-    while(word < sha->count_octets)
-    {
-        working_words(sha, word);
-        word += SIZE_SHA256;
-    }
+	size_t	word;
+
+	word = 0;
+	while (word < sha->count_octets)
+	{
+		working_words(sha, word);
+		word += SIZE_SHA256;
+	}
 }
 
-t_uchar *alg_sha256(const t_uchar *data, const size_t count_octets)
+t_uchar	*alg_sha256(const t_uchar *data, const size_t count_octets)
 {
-    t_uchar *result;
-    t_sha   sha;
-    
-    init_sha256(&sha, data, count_octets);
-    working_sha256(&sha);
-    result = get_string_hash(sha.hash, LEN_HASH_SHA256);
-    chenge_endian(result, LEN_HASH_SHA256);
-    return (result);
+	t_uchar	*result;
+	t_sha	sha;
+
+	init_sha256(&sha, data, count_octets);
+	working_sha256(&sha);
+	result = get_string_hash(sha.hash, LEN_HASH_SHA256);
+	chenge_endian(result, LEN_HASH_SHA256);
+	return (result);
 }
