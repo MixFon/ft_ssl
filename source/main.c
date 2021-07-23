@@ -9,17 +9,27 @@ void	init_ssl(t_ssl *ssl)
 	ft_memset(ssl, 0, sizeof(t_ssl));
 }
 
+void	help(void)
+{
+	ft_putstr_fd("Commands:\n", 2);
+	ft_putstr_fd("md5\nsha256\n", 2);
+	ft_putstr_fd("\nFlags:\n", 2);
+	ft_putstr_fd("-p\n-q\n-r\n-s\n", 2);
+	exit(-1);
+}
+
 /*
 ** Вывод сообщение об использовании.
 */
 void	print_usage(t_ssl *ssl, const char c, const char *message)
 {
-	ft_putstr_fd(ssl->name_algorithm, 2);
+	ft_putstr_fd(ssl->alg->name, 2);
 	ft_putstr_fd(message, 2);
 	ft_putchar_fd(c, 2);
 	ft_putstr_fd("\nusage: ", 2);
-	ft_putstr_fd(ssl->name_algorithm, 2);
-	ft_putstr_fd(" [-pqr] [-s string] [files ...]\n", 2);
+	ft_putstr_fd(ssl->alg->name, 2);
+	ft_putstr_fd(" [-pqr] [-s string] [files ...]\n\n", 2);
+	help();
 	exit(-1);
 }
 
@@ -156,16 +166,25 @@ void	fill_flags(t_ssl *ssl, int ac, const char **av)
 */
 void	check_name_algorithm(t_ssl *ssl, int ac, const char **av)
 {
+	t_alg	*algs;
+
+	algs = get_algorithms();
 	if (ac < 2)
 		sys_err("usage: ft_ssl command [command opts] [command args]\n");
-	if (ft_strcmp(av[1], "md5") && ft_strcmp(av[1], "sha256"))
+	while (algs->name != 0)
 	{
-		ft_putstr_fd("ft_ssl: Error: \'", 2);
-		ft_putstr_fd(av[1], 2);
-		ft_putstr_fd("\' is an invalid command.\n", 2);
-		exit(-1);
+		if (!ft_strcmp(av[1], algs->name))
+		{
+			ssl->alg = algs;
+			return ;
+		}
+		algs++;
 	}
-	ssl->name_algorithm = ft_strdup(av[1]);
+	ft_putstr_fd("ft_ssl: Error: \'", 2);
+	ft_putstr_fd(av[1], 2);
+	ft_putstr_fd("\' is an invalid command.\n", 2);
+	help();
+	exit(-1);
 }
 
 /*
@@ -186,7 +205,6 @@ void	delete_array_string(char ***array, size_t len)
 
 void	deinit_ssl(t_ssl *ssl)
 {
-	free(ssl->name_algorithm);
 	delete_array_string(&ssl->strings, ssl->count_strings);
 	delete_array_string(&ssl->file_names, ssl->count_file_names);
 }
@@ -272,7 +290,7 @@ t_uchar	*preparation(const t_uchar *data, size_t *count_octets, t_ssl *ssl)
 	zeros = (t_uchar *)ft_strnew(*count_octets);
 	ft_memcpy(zeros, temp, ssl->len_message_oct + 1);
 	ft_strdel((char **)&temp);
-	if (!ft_strcmp(ssl->name_algorithm, "md5"))
+	if (!ft_strcmp(ssl->alg->name, "md5"))
 		ft_memcpy(zeros + *count_octets - 8, &len_message, 8);
 	else
 	{
@@ -292,10 +310,7 @@ t_uchar	*get_hash(const t_uchar *data, t_ssl *ssl)
 	t_uchar	*new_data;
 
 	new_data = preparation(data, &count_octets, ssl);
-	if (!ft_strcmp(ssl->name_algorithm, "md5"))
-		hash = alg_md5(new_data, count_octets);
-	else
-		hash = alg_sha256(new_data, count_octets);
+	hash = ssl->alg->algorithm(new_data, count_octets);
 	free(new_data);
 	return (hash);
 }
@@ -303,15 +318,9 @@ t_uchar	*get_hash(const t_uchar *data, t_ssl *ssl)
 void	print_hash(t_ssl *ssl, const t_uchar *data)
 {
 	int	i;
-	int	len;
 
 	i = -1;
-	len = 0;
-	if (!ft_strcmp(ssl->name_algorithm, "md5"))
-		len = 16;
-	else
-		len = 32;
-	while (++i < len)
+	while (++i < ssl->alg->size)
 		ft_printf("%02x", data[i]);
 	ft_putendl("");
 }
@@ -337,7 +346,6 @@ void	print_hash_strings_files(t_ssl *ssl, const t_uchar *data,
 		const char *info)
 {
 	t_uchar	*hash;
-	int		len;
 	int		i;
 
 	i = -1;
@@ -346,18 +354,13 @@ void	print_hash_strings_files(t_ssl *ssl, const t_uchar *data,
 		print_hash(ssl, hash);
 	else if (ssl->flags[R])
 	{
-		len = 0;
-		if (!ft_strcmp(ssl->name_algorithm, "md5"))
-			len = LEN_HASH_MD5;
-		else
-			len = LEN_HASH_SHA256;
-		while (++i < len)
+		while (++i < ssl->alg->size)
 			ft_printf("%02x", hash[i]);
 		ft_printf(" %s\n", info);
 	}
 	else
 	{
-		ft_printf("%s (%s) = ", ssl->name_algorithm, info);
+		ft_printf("%s (%s) = ", ssl->alg->name_case, info);
 		print_hash(ssl, hash);
 	}
 	free(hash);
@@ -401,7 +404,7 @@ void	open_file(t_ssl *ssl, size_t i)
 	fd = open(ssl->file_names[i], O_RDONLY);
 	if (fd < 0)
 		ft_printf("%s: %s: Error open file.\n",
-			ssl->name_algorithm, ssl->file_names[i]);
+			ssl->alg->name, ssl->file_names[i]);
 	else
 	{
 		data = get_data_fd(fd, &ssl->len_message_oct);
@@ -424,11 +427,9 @@ void	working_files(t_ssl *ssl)
 	{
 		if (is_dir(ssl->file_names[i]))
 			ft_printf("%s: %s: Is a directory.\n",
-				ssl->name_algorithm, ssl->file_names[i]);
+				ssl->alg->name, ssl->file_names[i]);
 		else
-		{
 			open_file(ssl, i);
-		}
 		i++;
 	}
 }
@@ -443,10 +444,32 @@ void	run(t_ssl *ssl)
 		working_files(ssl);
 }
 
+/*
+** Возвращает массив структур с указателями на функцию.
+** Для добавления новой функции достаточно будет добавить новую структуру.
+*/
+t_alg	*get_algorithms(void)
+{
+	static t_alg	algorithms[] = {
+		{alg_md5, "md5", "MD5", 16},
+		{alg_sha256, "sha256", "SHA256", 32},
+		{0, 0, 0, 0},
+	};
+
+	return (algorithms);
+}
+
 int	main(int ac, const char *av[])
 {
 	t_ssl	ssl;
 
+	int i = 0;
+	while (++i < 10)
+	{
+		char *temp = ft_strnew(10);
+		temp = NULL;
+		ft_printf("Hello");
+	}
 	init_ssl(&ssl);
 	check_name_algorithm(&ssl, ac, av);
 	fill_flags(&ssl, ac, av);

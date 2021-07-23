@@ -6,7 +6,7 @@
 #    By: widraugr <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/29 13:07:44 by widraugr          #+#    #+#              #
-#    Updated: 2021/07/22 10:43:51 by mixfon           ###   ########.fr        #
+#    Updated: 2021/07/23 07:57:29 by mixfon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ all : $(NAME)
 
 $(NAME): $(DIROBJ) $(OBJ) 
 	make -C $(LIBDIR)
-	gcc $(FLAGS) $(OBJ) $(FLIB) $(FMLXLIB) -ltermcap -o $(NAME)
+	gcc -g $(FLAGS) $(OBJ) $(FLIB) $(FMLXLIB) -ltermcap -o $(NAME)
 
 $(DIROBJ)%.o : $(DIRC)%.c
 	gcc -g $(FLAGS) -c $< -o $@
