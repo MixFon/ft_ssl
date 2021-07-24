@@ -33,7 +33,6 @@ typedef struct s_md
 void	print_bits(t_uchar *str, size_t len);
 t_uchar	*alg_md5(const t_uchar *data, size_t count_octets);
 
-#endif
 /*
 ** File fill_arr_k.c
 */
@@ -57,3 +56,5 @@ void	rounds(t_md *md, const int words);
 void	step_four(t_md *md);
 t_uchar	*get_string_hash(t_uint *hash, int len);
 t_uchar	*alg_md5(const t_uchar *data, size_t count_octets);
+
+#endif

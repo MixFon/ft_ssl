@@ -1,6 +1,4 @@
-
 #include "../include/ft_ssl.h"
-
 #include "ft_printf.h"
 #include "ft_ssl.h"
 

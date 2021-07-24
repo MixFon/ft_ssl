@@ -46,7 +46,6 @@ typedef union u_elem
 
 t_alg	*get_algorithms(void);
 
-#endif
 /*
 ** File init_ssl.c
 */
@@ -58,9 +57,10 @@ void	print_array_string(char **arr, size_t len);
 /*
 ** File add_string_to_array.c
 */
-void	add_string_to_array(char ***array, size_t *count, const char *new_string);
+void	add_string_to_array(char ***array, size_t *count,
+			const char *new_string);
 void	add_string(t_ssl *ssl, int ac, const char **av);
-int	is_check(t_ssl *ssl, const char *arg);
+int		is_check(t_ssl *ssl, const char *arg);
 void	read_flag(t_ssl *ssl, int ac, const char **av);
 void	add_file_name(t_ssl *ssl, const char **av, int i);
 /*
@@ -84,9 +84,9 @@ void	print_hash(t_ssl *ssl, const t_uchar *data);
 */
 void	working_stdin(t_ssl *ssl);
 void	print_hash_strings_files(t_ssl *ssl, const t_uchar *data,
-		const char *info);
+			const char *info);
 void	working_strings(t_ssl *ssl);
-int	is_dir(const char *name_file);
+int		is_dir(const char *name_file);
 void	open_file(t_ssl *ssl, size_t i);
 /*
 ** File working_files.c
@@ -94,4 +94,6 @@ void	open_file(t_ssl *ssl, size_t i);
 void	working_files(t_ssl *ssl);
 void	run(t_ssl *ssl);
 t_alg	*get_algorithms(void);
-int	main(int ac, const char *av[]);
+int		main(int ac, const char *av[]);
+
+#endif

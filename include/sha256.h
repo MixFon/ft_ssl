@@ -45,7 +45,6 @@ void	print_bits(t_uchar *str, size_t len);
 t_uchar	*get_string_hash(t_uint *hash, int len);
 t_uchar	*alg_sha256(const t_uchar *data, const size_t count_octets);
 
-#endif
 /*
 ** File init_arr_k_sha256.c
 */
@@ -66,3 +65,5 @@ void	working_sha256(t_sha *sha);
 ** File alg_sha256.c
 */
 t_uchar	*alg_sha256(const t_uchar *data, const size_t count_octets);
+
+#endif

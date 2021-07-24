@@ -1,6 +1,4 @@
-
 #include "../include/ft_ssl.h"
-
 
 void	chenge_endian(t_uchar *data, size_t count_octets)
 {
