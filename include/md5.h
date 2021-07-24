@@ -34,3 +34,26 @@ void	print_bits(t_uchar *str, size_t len);
 t_uchar	*alg_md5(const t_uchar *data, size_t count_octets);
 
 #endif
+/*
+** File fill_arr_k.c
+*/
+void	fill_arr_k(t_md *md);
+void	fill_arr_s(t_md *md);
+void	init(t_md *md, const t_uchar *data, size_t count_octets);
+void	print_bits(t_uchar *str, size_t len);
+void	step_three(t_md *md);
+/*
+** File stage_one.c
+*/
+void	stage_one(t_uint *vars, int i);
+void	stage_two(t_uint *vars, int i);
+void	stage_three(t_uint *vars, int i);
+void	stage_four(t_uint *vars, int i);
+void	init_start_vars(t_md *md);
+/*
+** File rounds.c
+*/
+void	rounds(t_md *md, const int words);
+void	step_four(t_md *md);
+t_uchar	*get_string_hash(t_uint *hash, int len);
+t_uchar	*alg_md5(const t_uchar *data, size_t count_octets);

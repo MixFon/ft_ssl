@@ -46,3 +46,23 @@ t_uchar	*get_string_hash(t_uint *hash, int len);
 t_uchar	*alg_sha256(const t_uchar *data, const size_t count_octets);
 
 #endif
+/*
+** File init_arr_k_sha256.c
+*/
+void	init_arr_k_sha256(t_sha *sha);
+void	init_hash_start_value(t_sha *sha);
+void	init_sha256(t_sha *sha, const t_uchar *data, const size_t count_octets);
+void	init_vars(t_sha *sha);
+t_uint	rotate_right(t_uint elem, int count);
+/*
+** File mix_data.c
+*/
+void	mix_data(t_uint *data);
+void	update_hash(t_sha *sha);
+void	assigning_variables(t_sha *sha, t_uint *vars);
+void	working_words(t_sha *sha, const size_t word);
+void	working_sha256(t_sha *sha);
+/*
+** File alg_sha256.c
+*/
+t_uchar	*alg_sha256(const t_uchar *data, const size_t count_octets);

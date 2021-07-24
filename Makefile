@@ -6,7 +6,7 @@
 #    By: widraugr <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/29 13:07:44 by widraugr          #+#    #+#              #
-#    Updated: 2021/07/24 11:37:14 by mixfon           ###   ########.fr        #
+#    Updated: 2021/07/24 11:57:30 by mixfon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,11 +14,20 @@ NAME = ft_ssl
 
 LIBDIR = ./libft
 
-FILE_C = main.c
+FILE_C = add_string_to_array.c\
+		 chenge_endian.c\
+		 fill_flags.c\
+		 init_ssl.c\
+		 working_files.c\
+		 working_stdin.c
 
-FILE_MD5 = md5.c
+FILE_MD5 = fill_arr_k.c\
+		   rounds.c\
+		   stage_one.c
 
-FILE_SHA256 = sha256.c
+FILE_SHA256 = alg_sha256.c\
+			  init_arr_k_sha256.c\
+			  mix_data.c
 
 FLAGS = -Wall -Wextra -Werror -I libft -I include 
 
@@ -66,3 +75,4 @@ fclean: clean
 	make fclean -C $(LIBDIR)
 	
 re: fclean all 
+

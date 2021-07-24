@@ -47,3 +47,51 @@ typedef union u_elem
 t_alg	*get_algorithms(void);
 
 #endif
+/*
+** File init_ssl.c
+*/
+void	init_ssl(t_ssl *ssl);
+void	help(void);
+void	print_usage(t_ssl *ssl, const char c, const char *message);
+void	check_valid_flags(t_ssl *ssl, const char *arg);
+void	print_array_string(char **arr, size_t len);
+/*
+** File add_string_to_array.c
+*/
+void	add_string_to_array(char ***array, size_t *count, const char *new_string);
+void	add_string(t_ssl *ssl, int ac, const char **av);
+int	is_check(t_ssl *ssl, const char *arg);
+void	read_flag(t_ssl *ssl, int ac, const char **av);
+void	add_file_name(t_ssl *ssl, const char **av, int i);
+/*
+** File fill_flags.c
+*/
+void	fill_flags(t_ssl *ssl, int ac, const char **av);
+void	check_name_algorithm(t_ssl *ssl, int ac, const char **av);
+void	delete_array_string(char ***array, size_t len);
+void	deinit_ssl(t_ssl *ssl);
+char	*get_data_fd(int fd, size_t *len_message_oct);
+/*
+** File chenge_endian.c
+*/
+void	chenge_endian(t_uchar *data, size_t count_octets);
+size_t	get_count_zerors(size_t len);
+t_uchar	*preparation(const t_uchar *data, size_t *count_octets, t_ssl *ssl);
+t_uchar	*get_hash(const t_uchar *data, t_ssl *ssl);
+void	print_hash(t_ssl *ssl, const t_uchar *data);
+/*
+** File working_stdin.c
+*/
+void	working_stdin(t_ssl *ssl);
+void	print_hash_strings_files(t_ssl *ssl, const t_uchar *data,
+		const char *info);
+void	working_strings(t_ssl *ssl);
+int	is_dir(const char *name_file);
+void	open_file(t_ssl *ssl, size_t i);
+/*
+** File working_files.c
+*/
+void	working_files(t_ssl *ssl);
+void	run(t_ssl *ssl);
+t_alg	*get_algorithms(void);
+int	main(int ac, const char *av[]);
