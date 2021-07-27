@@ -57,7 +57,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "sha256 /Users/mixfon/Downloads/anydesk.dmg"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "sha256 -s &quot;Hello&quot;"
@@ -70,6 +70,10 @@
          <CommandLineArgument
             argument = "md5 -s Hello"
             isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "base64 -i 11111 -o 33333"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "md5 -r -s Hello"

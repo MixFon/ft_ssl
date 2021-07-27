@@ -44,14 +44,40 @@ t_alg	*get_algorithms(void)
 	return (algorithms);
 }
 
+/*
+** Возвращает массив структур с указатемями на функцию и их именами.
+*/
+t_type	*get_type_programm(void)
+{
+	static t_type	type_programm[] = {
+		{type_hashing_algorithms, "md5"},
+		{type_hashing_algorithms, "sha256"},
+		{type_base64, "base64"},
+		{0, 0}
+	};
+	
+	return (type_programm);
+}
+
 int	main(int ac, const char *av[])
 {
-	t_ssl	ssl;
+	t_type	*type;
 
-	init_ssl(&ssl);
-	check_name_algorithm(&ssl, ac, av);
-	fill_flags(&ssl, ac, av);
-	run(&ssl);
-	deinit_ssl(&ssl);
-	return (0);
+	type = get_type_programm();
+	if (ac < 2)
+		sys_err("usage: ft_ssl command [command opts] [command args]\n");
+	while (type->name != 0)
+	{
+		if (!ft_strcmp(av[1], type->name))
+		{
+			type->funtion_type(ac, av);
+			return (0);
+		}
+		type++;
+	}
+	ft_putstr_fd("ft_ssl: Error: \'", 2);
+	ft_putstr_fd(av[1], 2);
+	ft_putstr_fd("\' is an invalid command.\n", 2);
+	help();
+	return (-1);
 }

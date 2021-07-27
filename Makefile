@@ -6,7 +6,7 @@
 #    By: widraugr <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/29 13:07:44 by widraugr          #+#    #+#              #
-#    Updated: 2021/07/24 11:57:30 by mixfon           ###   ########.fr        #
+#    Updated: 2021/07/27 10:14:38 by mixfon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ FILE_C = add_string_to_array.c\
 		 fill_flags.c\
 		 init_ssl.c\
 		 working_files.c\
+		 type_hashing_algorithms.c\
 		 working_stdin.c
 
 FILE_MD5 = fill_arr_k.c\
@@ -29,7 +30,10 @@ FILE_SHA256 = alg_sha256.c\
 			  init_arr_k_sha256.c\
 			  mix_data.c
 
-FLAGS = -Wall -Wextra -Werror -I libft -I include 
+FILE_BASE64 = base64.c
+
+#FLAGS = -g -Wall -Wextra -Werror -I libft -I include 
+FLAGS = -g -I libft -I include 
 
 FLIB = -L ./libft -lftprintf 
 
@@ -39,6 +43,8 @@ DIRMD5 = ./md5/
 
 DIRSHA256 = ./sha256/
 
+DIRBASE64 = ./base64/
+
 DIROBJ = ./obj/
 
 OBJ = $(addprefix $(DIROBJ), $(FILE_C:.c=.o))
@@ -47,20 +53,25 @@ OBJMD5 = $(addprefix $(DIROBJ), $(FILE_MD5:.c=.o))
 
 OBJSHA256 = $(addprefix $(DIROBJ), $(FILE_SHA256:.c=.o))
 
+OBJBASE64 = $(addprefix $(DIROBJ), $(FILE_BASE64:.c=.o))
+
 all : $(NAME)
 
-$(NAME): $(DIROBJ) $(OBJ) $(OBJMD5) $(OBJSHA256)
+$(NAME): $(DIROBJ) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64)
 	make -C $(LIBDIR)
-	gcc $(FLAGS) $(OBJ) $(OBJMD5) $(OBJSHA256) $(FLIB) -o $(NAME)
+	gcc $(FLAGS) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64) $(FLIB) -o $(NAME)
 
 $(DIROBJ)%.o : $(DIRC)%.c
-	gcc -g $(FLAGS) -c $< -o $@
+	gcc $(FLAGS) -c $< -o $@
 
 $(DIROBJ)%.o : $(DIRMD5)%.c
-	gcc -g $(FLAGS) -c $< -o $@
+	gcc $(FLAGS) -c $< -o $@
 
 $(DIROBJ)%.o : $(DIRSHA256)%.c
-	gcc -g $(FLAGS) -c $< -o $@
+	gcc $(FLAGS) -c $< -o $@
+
+$(DIROBJ)%.o : $(DIRBASE64)%.c
+	gcc $(FLAGS) -c $< -o $@
 
 $(DIROBJ):
 	mkdir -p $(DIROBJ)

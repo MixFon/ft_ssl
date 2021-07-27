@@ -4,6 +4,7 @@
 # include <sys/stat.h>
 # include "md5.h"
 # include "sha256.h"
+# include "base64.h"
 # include "libft.h"
 
 # define UINT_MAX   0xFFFFFFFF
@@ -15,6 +16,12 @@
 # define S			3
 
 # define BUFF		4096
+
+typedef struct s_type
+{
+	void	(*funtion_type)(int ac, const char **av);
+	char	*name;
+}				t_type;
 
 typedef struct s_alg
 {
@@ -95,5 +102,9 @@ void	working_files(t_ssl *ssl);
 void	run(t_ssl *ssl);
 t_alg	*get_algorithms(void);
 int		main(int ac, const char *av[]);
+/*
+** File type_hashing_algorithms.c
+*/
+void	type_hashing_algorithms(int ac, const char **av);
 
 #endif
