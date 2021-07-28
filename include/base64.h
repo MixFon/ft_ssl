@@ -4,6 +4,8 @@
 # include "libft.h"
 # include "ft_ssl.h"
 
+# define UNKNOWN_SYMBOL 0
+
 typedef struct	s_base64
 {
 	int			flags[4];

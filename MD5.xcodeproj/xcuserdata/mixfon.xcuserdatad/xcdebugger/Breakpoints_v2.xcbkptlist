@@ -231,32 +231,48 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1D98E2B3-3659-4A21-8D53-018F7A523C23"
+            uuid = "1DB97C8C-3FCD-4356-B70A-1EB8CBE68CA4"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "base64/base64.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
-            landmarkName = "working_data(base, data, size)"
+            startingLineNumber = "210"
+            endingLineNumber = "210"
+            landmarkName = "decoding(base, data, size)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "3BA98605-E497-4BF1-8E09-B00A53D1C6F3"
+            uuid = "A93BC084-32B0-41FF-844D-8E6665C037BC"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "base64/base64.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "175"
-            endingLineNumber = "175"
-            landmarkName = "working_data(base, data, size)"
+            startingLineNumber = "208"
+            endingLineNumber = "208"
+            landmarkName = "decoding(base, data, size)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8FCE9349-2102-48D9-8EF1-13351CF7D81C"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "base64/base64.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "244"
+            endingLineNumber = "244"
+            landmarkName = "output_in_file(base)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

@@ -57,6 +57,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "base64 -e -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/for_test.txt"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "base64 -d -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/for_test.txt"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

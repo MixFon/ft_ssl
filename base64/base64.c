@@ -66,7 +66,7 @@ void	read_flags(t_base64 *base, int ac, const char **av)
 			print_error(av[i]);
 	}
 	if (base->flags[base_d] && base->flags[base_e])
-		print_error("1111\0");
+		print_error("\0");
 }
 
 void	working_file_base64(t_base64 *base, char **data, size_t *read_octets)
@@ -121,31 +121,10 @@ void	print_octest(void *data, size_t size)
 	ft_printf("\n");
 }
 
-void	fill_word(int *word, char *data)
-{
-	*word = 0;
-	*word = *data;
-	//ft_printf("word = [%x]\n", *word);
-	*word = *word << 8;
-	//ft_printf("word = [%x]\n", *word);
-	*word = *word | *(data + 1);
-	//ft_printf("word = [%x]\n", *word);
-	*word = *word << 8;
-	//ft_printf("word = [%x]\n", *word);
-	*word = *word | *(data + 2);
-	//ft_printf("word = [%x]\n", *word);
-}
-
-void	fill_numbers(int word, int *numbers)
-{
-	numbers[0] = word >> 18;
-	numbers[1] = (word >> 12) & 0x3f;
-	numbers[2] = (word >> 6) & 0x3f;
-	numbers[3] = word & 0x3f;
-	//ft_printf("0 = {%d}, 1 = {%d}, 2 = {%d}, 3 = [%d]\n", numbers[0], numbers[1], numbers[2], numbers[3]);
-}
-
-void	fill_ciphertext(t_base64 *base, int *numbers)
+/*
+** Заполнение шифра.
+*/
+void	fill_ciphertext(t_base64 *base, char *numbers)
 {
 	int	i;
 
@@ -155,51 +134,151 @@ void	fill_ciphertext(t_base64 *base, int *numbers)
 	base->index += 4;
 }
 
-void	working_data(t_base64 *base, char *data, size_t size)
+/*
+** Заполнение шифратекста.
+*/
+void	fill_plaintext(t_base64 *base, char *numbers)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 3)
+		base->ciphertext[base->index + i] = numbers[i];
+	base->index += 3;
+}
+
+/*
+** Кодирование информации.
+*/
+void	encoding(t_base64 *base, char *data, size_t size)
 {
 	size_t	i;
-	int		word;
-	int		numbers[4];
+	char	*word;
+	char	numbers[4];
 	int		equal;
 
 	i = 0;
 	equal = 0;
 	if (size % 3 != 0)
 		equal = 3 - (size % 3);
-	//ft_printf("size = [%d]\n", size);
 	base->ciphertext = ft_strnew(size + size / 3 + 3);
-	//ft_printf("size + size / 3 + 1 = [%d]\n", size + size / 3 + 1);
 	resize_data(&data, &size);
-	//ft_printf("size = [%d]\n", size);
-	//print_octest(data, size);
 	while (i < size)
 	{
-		fill_word(&word, data + i);
-		fill_numbers(word, numbers);
+		word = data + i;
+		numbers[0] = word[0] >> 2;
+		numbers[1] = ((word[0] & 0x03) << 4) | (word[1] >> 4);
+		numbers[2] = ((word[1] & 0x0f) << 2) | (word[2] >> 6);
+		numbers[3] = word[2] & 0x3f;
 		fill_ciphertext(base, numbers);
 		i += 3;
 	}
+//	ft_printf("size = [%d] base->index = {%d}\n", size, base->index);
+//	ft_printf("ft_strlen = [%d]\n", ft_strlen(base->ciphertext));
 	while (equal > 0)
-	{
-		//ft_printf("equal = [%d]\n", equal);
 		base->ciphertext[size + size / 3 - equal--] = '=';
-	}
 	free(data);
-	//ft_printf("%d\n", ft_strlen(base->ciphertext));
-	ft_printf("%s\n", base->ciphertext);
 }
 
+/*
+** Возвращает индекс в массиве символов base64.
+*/
+int	get_index(t_base64 *base, char c)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 64)
+	{
+		if (base->symbols[i] == c)
+			return (i);
+	}
+	return (UNKNOWN_SYMBOL);
+}
+
+/*
+** Расшифровка данных.
+*/
+void	decoding(t_base64 *base, char *data, size_t size)
+{
+	size_t	i;
+	char 	*word;
+	char	indexes[3];
+
+	i = 0;
+	base->ciphertext = ft_strnew(size);
+	while (i < size)
+	{
+		word = data + i;
+		indexes[0] = (get_index(base, word[0]) << 2) | ((get_index(base, word[1]) & 0x30) >> 4);
+		indexes[1] = (get_index(base, word[1]) << 4) | ((get_index(base, word[2]) & 0x3c) >> 2);
+		indexes[2] = (get_index(base, word[2]) << 6) | get_index(base, word[3]);
+		fill_plaintext(base, indexes);
+		i += 4;
+	}
+	free(data);
+}
+
+/*
+** Определение расшифорвки или шифровки.
+*/
+void	working_data(t_base64 *base, char *data, size_t size)
+{
+	if (base->flags[base_d])
+		decoding(base, data, size);
+	else
+		encoding(base, data, size);
+}
+
+void	output_in_file(t_base64 *base)
+{
+	int		fd;
+	ssize_t	len;
+
+	fd = open(base->output_file, O_WRONLY | O_CREAT | O_TRUNC, S_IWRITE | S_IREAD);
+	if (fd < 0)
+	{
+		ft_putstr_fd("Error open file: ", 2);
+		sys_err(base->output_file);
+	}
+	len = write(fd, base->ciphertext, base->index);
+	if (len != base->index)
+		sys_err("Error write file\n");
+	close(fd);
+}
+
+void	output_in_console(t_base64 *base)
+{
+	ft_printf("%s", base->ciphertext);
+}
+
+/*
+** Вывод шифротекст или шифр в зависимости от флага.
+** В консоль или в файл.
+*/
+void	output_chiphertext(t_base64 *base)
+{
+	if (base->flags[base_o])
+		output_in_file(base);
+	else
+		output_in_console(base);
+}
+
+/*
+** Получение информации в зависимости от флагов.
+*/
 void	working_base64(t_base64 *base)
 {
 	char	*data;
 	size_t	read_octets;
 
+	read_octets = 0;
 	if (base->flags[base_i])
 		working_file_base64(base, &data, &read_octets);
 	else
 		working_stdin_base64(base, &data, &read_octets);
 	working_data(base, data, read_octets);
-	//ft_printf("data = {%s} octets = [%d]\n", data, read_octets);
+	output_chiphertext(base);
 }
 
 void	deinit_base64(t_base64 *base)
@@ -215,7 +294,6 @@ void	init_base64(t_base64 *base)
 	ft_memset(base, 0, sizeof(t_base64));
 	base->symbols = ft_multi_strdup(3, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 			"abcdefghijklmnopqrstuvwxyz", "0123456789+/");
-	//ft_printf(base->symbols);
 }
 
 void	type_base64(int ac, const char **av)
