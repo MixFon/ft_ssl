@@ -6,7 +6,7 @@
 #    By: widraugr <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/29 13:07:44 by widraugr          #+#    #+#              #
-#    Updated: 2021/07/28 11:03:02 by mixfon           ###   ########.fr        #
+#    Updated: 2021/07/30 10:06:08 by mixfon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,8 @@ FILE_SHA256 = alg_sha256.c\
 
 FILE_BASE64 = base64.c
 
+FILE_DES = des.c
+
 #FLAGS = -g -Wall -Wextra -Werror -I libft -I include 
 FLAGS = -g -I libft -I include 
 
@@ -45,6 +47,8 @@ DIRSHA256 = ./sha256/
 
 DIRBASE64 = ./base64/
 
+DIRDES = ./des/
+
 DIROBJ = ./obj/
 
 OBJ = $(addprefix $(DIROBJ), $(FILE_C:.c=.o))
@@ -55,11 +59,13 @@ OBJSHA256 = $(addprefix $(DIROBJ), $(FILE_SHA256:.c=.o))
 
 OBJBASE64 = $(addprefix $(DIROBJ), $(FILE_BASE64:.c=.o))
 
+OBJDES = $(addprefix $(DIROBJ), $(FILE_DES:.c=.o))
+
 all : $(NAME)
 
-$(NAME): $(DIROBJ) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64)
+$(NAME): $(DIROBJ) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64) $(OBJDES)
 	make -C $(LIBDIR)
-	gcc $(FLAGS) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64) $(FLIB) -o $(NAME)
+	gcc $(FLAGS) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64) $(OBJDES) $(FLIB) -o $(NAME)
 
 $(DIROBJ)%.o : $(DIRC)%.c
 	gcc $(FLAGS) -c $< -o $@
@@ -71,6 +77,9 @@ $(DIROBJ)%.o : $(DIRSHA256)%.c
 	gcc $(FLAGS) -c $< -o $@
 
 $(DIROBJ)%.o : $(DIRBASE64)%.c
+	gcc $(FLAGS) -c $< -o $@
+
+$(DIROBJ)%.o : $(DIRDES)%.c
 	gcc $(FLAGS) -c $< -o $@
 
 $(DIROBJ):

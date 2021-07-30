@@ -5,6 +5,7 @@
 # include "md5.h"
 # include "sha256.h"
 # include "base64.h"
+# include "des.h"
 # include "libft.h"
 
 # define UINT_MAX   0xFFFFFFFF

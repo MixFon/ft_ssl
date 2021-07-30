@@ -155,6 +155,7 @@ do
 	fi
 	let count=$count+1
 done
+rm -rf file_1
 echo $CLEAR_LINE
 echo "$GREEN \t$count_ok OK $WHITE"
 echo "$RED \t$count_error KO $WHITE"

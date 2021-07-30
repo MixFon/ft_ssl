@@ -10,7 +10,7 @@ void	print_usage_base64(void)
 	exit(-1);
 }
 
-void	print_error(const char *str)
+void	print_error_base64(const char *str)
 {
 	ft_putstr_fd("base64: invalid option -- ", 2);
 	ft_putstr_fd(str, 2);
@@ -34,7 +34,7 @@ void	fill_name_file(char **name_file, int ac, const char **av, int *i)
 void	set_flag(t_base64 *base, int ac, const char **av, int *i)
 {
 	if (ft_strlen(av[*i]) != 2)
-		print_error(av[*i]);
+		print_error_base64(av[*i]);
 	if (av[*i][1] == 'e')
 		base->flags[base_e] = 1;
 	else if (av[*i][1] == 'd')
@@ -50,7 +50,7 @@ void	set_flag(t_base64 *base, int ac, const char **av, int *i)
 		fill_name_file(&base->output_file, ac, av, i);
 	}
 	else
-		print_error(&av[*i][1]);
+		print_error_base64(&av[*i][1]);
 }
 
 void	read_flags(t_base64 *base, int ac, const char **av)
@@ -63,10 +63,10 @@ void	read_flags(t_base64 *base, int ac, const char **av)
 		if (av[i][0] == '-')
 			set_flag(base, ac, av, &i);
 		else
-			print_error(av[i]);
+			print_error_base64(av[i]);
 	}
 	if (base->flags[base_d] && base->flags[base_e])
-		print_error("\0");
+		print_error_base64("\0");
 }
 
 void	working_file_base64(t_base64 *base, char **data, size_t *read_octets)
@@ -104,7 +104,6 @@ void	resize_data(char **data, size_t *size)
 		ft_memcpy(new_data, *data, *size);
 		*size = *size + (3 - *size % 3);
 		free(*data);
-		//ft_strdel(data);
 		*data = new_data;
 	}
 }
@@ -114,7 +113,8 @@ void	print_octest(void *data, size_t size)
 	size_t	i;
 
 	i = 0;
-	while (i < size) {
+	while (i < size)
+	{
 		ft_printf("%2.2x", *(((char *)data) + i));
 		i++;
 	}
@@ -173,8 +173,6 @@ void	encoding(t_base64 *base, char *data, size_t size)
 		fill_ciphertext(base, numbers);
 		i += 3;
 	}
-//	ft_printf("size = [%d] base->index = {%d}\n", size, base->index);
-//	ft_printf("ft_strlen = [%d]\n", ft_strlen(base->ciphertext));
 	while (equal > 0)
 		base->ciphertext[size + size / 3 - equal--] = '=';
 	free(data);
@@ -202,7 +200,7 @@ int	get_index(t_base64 *base, char c)
 void	decoding(t_base64 *base, char *data, size_t size)
 {
 	size_t	i;
-	char 	*word;
+	char	*word;
 	char	indexes[3];
 
 	i = 0;
@@ -210,8 +208,10 @@ void	decoding(t_base64 *base, char *data, size_t size)
 	while (i < size)
 	{
 		word = data + i;
-		indexes[0] = (get_index(base, word[0]) << 2) | ((get_index(base, word[1]) & 0x30) >> 4);
-		indexes[1] = (get_index(base, word[1]) << 4) | ((get_index(base, word[2]) & 0x3c) >> 2);
+		indexes[0] = (get_index(base, word[0]) << 2)
+			| ((get_index(base, word[1]) & 0x30) >> 4);
+		indexes[1] = (get_index(base, word[1]) << 4)
+			| ((get_index(base, word[2]) & 0x3c) >> 2);
 		indexes[2] = (get_index(base, word[2]) << 6) | get_index(base, word[3]);
 		fill_plaintext(base, indexes);
 		i += 4;
@@ -235,7 +235,8 @@ void	output_in_file(t_base64 *base)
 	int		fd;
 	ssize_t	len;
 
-	fd = open(base->output_file, O_WRONLY | O_CREAT | O_TRUNC, S_IWRITE | S_IREAD);
+	fd = open(base->output_file, O_WRONLY | O_CREAT | O_TRUNC,
+			  S_IWRITE | S_IREAD);
 	if (fd < 0)
 	{
 		ft_putstr_fd("Error open file: ", 2);

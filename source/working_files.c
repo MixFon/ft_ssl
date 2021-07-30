@@ -53,6 +53,7 @@ t_type	*get_type_programm(void)
 		{type_hashing_algorithms, "md5"},
 		{type_hashing_algorithms, "sha256"},
 		{type_base64, "base64"},
+		{type_des, "des"},
 		{0, 0}
 	};
 	
