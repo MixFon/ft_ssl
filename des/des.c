@@ -1,4 +1,5 @@
 #include "des.h"
+#include "hmac.h"
 
 void	init_des(t_des *des)
 {
@@ -297,6 +298,11 @@ void	type_des(int ac, const char **av)
 {
 	t_des	des;
 
+	t_uchar *temp = hmac_md5("key", "The quick brown fox jumps over the lazy dog");
+	print_bits(temp, 16);
+	free(temp);
+	//ft_printf("{%s}\n", temp);
+	exit(-1);
 	init_des(&des);
 	read_flags_des(&des, ac, av);
 	run_des(&des);

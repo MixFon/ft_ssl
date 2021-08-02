@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		291F852226B8079C001D2D24 /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = 291F852126B8079C001D2D24 /* hmac.c */; };
 		296DEF2926AEEEEF00701338 /* fill_flags.c in Sources */ = {isa = PBXBuildFile; fileRef = 296DEF2326AEEEEF00701338 /* fill_flags.c */; };
 		296DEF2A26AEEEEF00701338 /* working_stdin.c in Sources */ = {isa = PBXBuildFile; fileRef = 296DEF2426AEEEEF00701338 /* working_stdin.c */; };
 		296DEF2B26AEEEEF00701338 /* add_string_to_array.c in Sources */ = {isa = PBXBuildFile; fileRef = 296DEF2526AEEEEF00701338 /* add_string_to_array.c */; };
@@ -142,6 +143,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		291F852126B8079C001D2D24 /* hmac.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hmac.c; sourceTree = "<group>"; };
+		291F852426B807D8001D2D24 /* hmac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hmac.h; sourceTree = "<group>"; };
 		296DEF2326AEEEEF00701338 /* fill_flags.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fill_flags.c; sourceTree = "<group>"; };
 		296DEF2426AEEEEF00701338 /* working_stdin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = working_stdin.c; sourceTree = "<group>"; };
 		296DEF2526AEEEEF00701338 /* add_string_to_array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = add_string_to_array.c; sourceTree = "<group>"; };
@@ -285,6 +288,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		291F852026B80771001D2D24 /* hmac */ = {
+			isa = PBXGroup;
+			children = (
+				291F852126B8079C001D2D24 /* hmac.c */,
+			);
+			path = hmac;
+			sourceTree = "<group>";
+		};
 		296DEF3026AEEF0400701338 /* md5 */ = {
 			isa = PBXGroup;
 			children = (
@@ -338,6 +349,7 @@
 		29A81D2C26764CA400F08792 = {
 			isa = PBXGroup;
 			children = (
+				291F852026B80771001D2D24 /* hmac */,
 				2991400326B28538005BD0BF /* des */,
 				296DEF3F26AFE27A00701338 /* base64 */,
 				296DEF3026AEEF0400701338 /* md5 */,
@@ -365,6 +377,7 @@
 				299DEDDE269750BF004B60B1 /* ft_ssl.h */,
 				299DEDE426998EE6004B60B1 /* sha256.h */,
 				2991400726B2856B005BD0BF /* des.h */,
+				291F852426B807D8001D2D24 /* hmac.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -623,6 +636,7 @@
 				29A81EB72676517E00F08792 /* ft_isprint.c in Sources */,
 				296DEF3926AEEF0400701338 /* rounds.c in Sources */,
 				29A81ED72676517E00F08792 /* ft_memset_wchar.c in Sources */,
+				291F852226B8079C001D2D24 /* hmac.c in Sources */,
 				29A81E912676517E00F08792 /* ft_lstnew.c in Sources */,
 				29A81E8F2676517E00F08792 /* ft_put_percent.c in Sources */,
 				29A81EE52676517E00F08792 /* ft_put_hexadecimal.c in Sources */,
