@@ -52,7 +52,7 @@ void	init_start_vars(t_md *md);
 /*
 ** File rounds.c
 */
-void	rounds(t_md *md, const int words);
+void	rounds(t_md *md, const size_t words);
 void	step_four(t_md *md);
 t_uchar	*get_string_hash(t_uint *hash, int len);
 t_uchar	*alg_md5(const t_uchar *data, size_t count_octets);

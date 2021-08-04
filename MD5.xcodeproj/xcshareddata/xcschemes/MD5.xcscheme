@@ -56,7 +56,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "des -a -i hello -k 123c -s aab"
+            argument = "des ARPHSALJUABSGWIEUAEVBXEVKMJRFYHZIBYTASLPEZ JHH"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

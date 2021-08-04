@@ -62,7 +62,7 @@ void	print_bits(t_uchar *str, size_t len)
 	i = 0;
 	while (i < len)
 	{
-		ft_printf("%02x ", *str);
+		ft_printf("%02x", *str);
 		str++;
 		i++;
 	}

@@ -3,6 +3,6 @@
 
 #include "ft_ssl.h"
 
-t_uchar *hmac_md5(const char *key, const char *salt);
+t_uchar *hmac_md5(const char *key, const t_uchar *salt);
 
 #endif

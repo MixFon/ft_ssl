@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-count=0
 count_ok=0
 count_error=0
 
-len=100
+end_range=101
+start_range=1
+
+count=$start_range
 
 YELLOW="\033[1;33m"
 GREEN="\033[1;32m"
@@ -15,9 +17,9 @@ CLEAR_SCREEN="\033[2J"
 CLEAR_LINE="\033[2K\c"
 
 echo "$YELLOW Test encoding stdin $WHITE"
-while [[ count -lt len ]]
+while [[ count -lt end_range ]]
 do
-	str=$(echo $count | python3  generate_string.py)
+	str=$(cat /dev/random | base64 | head -c $count )
 	one=$(echo $str | ./ft_ssl base64 -e)
 	two=$(echo $str | openssl base64 -A)
 	# echo "-----"
@@ -40,13 +42,13 @@ echo "$GREEN \t$count_ok OK $WHITE"
 echo "$RED \t$count_error KO $WHITE"
 
 #----------------------------------------------------------------------
-count=0
+count=$start_range
 count_ok=0
 count_error=0
 echo "$YELLOW Test encoding file $WHITE"
-while [[ count -lt len ]]
+while [[ count -lt end_range ]]
 do
-	str=$(echo $count | python3  generate_string.py)
+	str=$(cat /dev/random | base64 | head -c $count )
 	echo $str > temp
 	one=$(./ft_ssl base64 -e -i temp)
 	two=$(openssl base64 -A -in temp)
@@ -70,12 +72,12 @@ echo "$RED \t$count_error KO $WHITE"
 
 #----------------------------------------------------------------------
 echo "$YELLOW Test write ot file $WHITE"
-count=0
+count=$start_range
 count_ok=0
 count_error=0
-while [[ count -lt len ]]
+while [[ count -lt end_range ]]
 do
-	str=$(echo $count | python3  generate_string.py)
+	str=$(cat /dev/random | base64 | head -c $count )
 	echo $str | ./ft_ssl base64 -e -o file_1
 	echo $str | openssl base64 -A -out file_2
 	# echo "-----"
@@ -102,12 +104,12 @@ echo "$RED \t$count_error KO $WHITE"
 
 #----------------------------------------------------------------------
 echo "$YELLOW Test decoding $WHITE"
-count=0
+count=$start_range
 count_ok=0
 count_error=0
-while [[ count -lt len ]]
+while [[ count -lt end_range ]]
 do
-	str=$(echo $count | python3  generate_string.py)
+	str=$(cat /dev/random | base64 | head -c $count )
 	chipher=$(echo $str | base64)
 	one=$(echo $chipher | ./ft_ssl base64 -d)
 	# echo "-----"
@@ -131,12 +133,12 @@ echo "$RED \t$count_error KO $WHITE"
 
 #----------------------------------------------------------------------
 echo "$YELLOW Test decoding and write to file $WHITE"
-count=0
+count=$start_range
 count_ok=0
 count_error=0
-while [[ count -lt len ]]
+while [[ count -lt end_range ]]
 do
-	str=$(echo $count | python3  generate_string.py)
+	str=$(cat /dev/random | base64 | head -c $count )
 	chipher=$(echo $str | base64)
 	echo $chipher | ./ft_ssl base64 -d -o file_1
 	one=$(cat file_1)

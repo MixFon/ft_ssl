@@ -3,7 +3,7 @@
 /*
 ** Основное тело алгоритма. Используются указатели на функцию.
 */
-void	rounds(t_md *md, const int words)
+void	rounds(t_md *md, const size_t words)
 {
 	int		i;
 	t_uint	*data;
