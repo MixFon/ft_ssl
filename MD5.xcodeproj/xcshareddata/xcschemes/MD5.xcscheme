@@ -56,8 +56,20 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "des ARPHSALJUABSGWIEUAEVBXEVKMJRFYHZIBYTASLPEZ JHH"
+            argument = "des -s 123 -p hello123123 -w -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/temp.txt"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "des -k 5067E59B32456EA4 -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/input_file -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -e"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "des -k 5067E59B32456EA4 -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/decode -d"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "des ARPHSALJUABSGWIEUAEVBXEVKMJRFYHZIBYTASLPEZ JHH"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "base64 -e -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/for_test.txt"

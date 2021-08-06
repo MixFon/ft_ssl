@@ -226,6 +226,7 @@ void	deinit_des(t_des *des)
 	ft_strdel(&des->output_file);
 	ft_strdel(&des->password);
 	ft_strdel((char **)(&des->message));
+	ft_strdel((char **)(&des->output_message));
 }
 
 /*
@@ -314,18 +315,29 @@ void	xor(t_uchar *result, t_uchar *u)
 }
 
 /*
+** Переводит 8 отктетов строки в число uint64_t
+*/
+uint64_t	string_to_uinit64(uint8_t *message)
+{
+	uint64_t	result;
+	size_t		i;
+
+	i = -1;
+	result = 0;
+	while (++i < 8)
+	{
+		result = result << 8;
+		result = result | message[i];
+	}
+	return (result);
+}
+
+/*
 ** Переволит ключ в виде строки в число.
 */
 void	fill_key(t_des *des, t_uchar *result)
 {
-	int	i;
-
-	i = -1;
-	while (++i < 8)
-	{
-		des->key = des->key << 8;
-		des->key = des->key | result[i];
-	}
+	des->key = string_to_uinit64(result);
 	des->flags[des_k] = 1;
 }
 
@@ -337,9 +349,9 @@ void	fill_key(t_des *des, t_uchar *result)
 void	pbkdf(t_des *des)
 {
 	int		i;
-	t_uchar	*u;
-	t_uchar	*temp;
-	t_uchar	result[16];
+	uint8_t	*u;
+	uint8_t	*temp;
+	uint8_t	result[16];
 
 	i = 1;
 	u = first_step(des->password, des->salt);
@@ -375,7 +387,7 @@ uint8_t	*get_pc1(void)
 		57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18,
 		10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36,
 		63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22,
-		14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4
+		14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4,
 	};
 
 	return (pc1);
@@ -390,6 +402,52 @@ uint8_t	*get_pc2(void)
 	};
 
 	return (pc2);
+}
+
+uint8_t	*get_ip(void)
+{
+	static uint8_t	ip[] = {
+		58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4,
+		62, 54, 46, 38, 30, 22, 14, 6, 64, 56, 48, 40, 32, 24, 16, 8,
+		57, 49, 41, 33, 25, 17, 9, 1, 59, 51, 43, 35, 27, 19, 11, 3,
+		61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7
+	};
+
+	return (ip);
+}
+
+uint8_t	*get_e(void)
+{
+	static uint8_t	e[] = {
+		32, 1, 2, 3, 4, 5, 4, 5, 6, 7, 8, 9,
+		8, 9, 10, 11, 12, 13, 12, 13, 14, 15, 16, 17,
+		16, 17, 18, 19, 20, 21, 20, 21, 22, 23, 24, 25,
+		24, 25, 26, 27, 28, 29, 28, 29, 30, 31, 32, 1
+	};
+
+	return (e);
+}
+
+uint8_t	*get_p(void)
+{
+	static uint8_t	p[] = {
+		16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10,
+		2, 8, 24, 14, 32, 27, 3, 9, 19, 13, 30, 6, 22, 11, 4, 25,
+	};
+
+	return (p);
+}
+
+uint8_t	*get_ip_final(void)
+{
+	static uint8_t	ip_final[] = {
+		58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4,
+		62, 54, 46, 38, 30, 22, 14, 6, 64, 56, 48, 40, 32, 24, 16, 8,
+		57, 49, 41, 33, 25, 17, 9, 1, 59, 51, 43, 35, 27, 19, 11, 3,
+		61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7
+	};
+
+	return (ip_final);
 }
 
 /*
@@ -420,16 +478,18 @@ void shift_to_left_28(uint32_t *c, uint32_t *d, int round)
 */
 void	working_pc1(t_des *des)
 {
-	uint8_t	*pc1;
-	int		i;
+	uint8_t		*pc1;
+	uint64_t	result;
+	int			i;
 
 	pc1 = get_pc1();
 	i = -1;
 	des->key56 = 0;
+	result = 0;
 	while (++i < 56)
 	{
-		des->key56 = des->key56 << 0x1;
-		des->key56 = des->key56 | ((des->key >> (pc1[i] - 1)) & 0x1);
+		des->key56 = des->key56 << 1;
+		des->key56 |= (des->key >> (64 - pc1[i])) & 0x1;
 	}
 }
 
@@ -448,11 +508,13 @@ void	working_pc2(t_des *des, int i)
 	key56 = key56 | des->d0;
 	pc2 = get_pc2();
 	des->keys[i] = 0;
-	//ft_printf("key56 = [%llx]\n", key56);
+	ft_printf("des->c0 = {%8.8x}\ndes->d0 = {%8.8x}\n", des->c0, des->d0);
+	ft_printf("key56 = [%16.16llx]\n", key56);
 	while (++j < 48)
 	{
-		des->keys[i] = des->keys[i] << 0x1;
-		des->keys[i] = des->keys[i] | ((key56 >> (pc2[j] - 1)) & 0x1);
+		des->keys[i] = des->keys[i] << 1;
+		des->keys[i] = des->keys[i] | ((key56 >> (56 - pc2[j])) & 0x1);
+		//ft_printf("j = {%d} pc2 = {%d}\n", j, pc2[47 - j]);
 	}
 	//ft_printf("des->keys[%d] = [%llx]\n", i, des->keys[i]);
 }
@@ -466,12 +528,15 @@ void	generate_kays(t_des *des)
 
 	i = -1;
 	working_pc1(des);
+	ft_printf("key_pc1 = {%16.16llx}\n", des->key56);
 	des->c0 = (des->key56 >> 28) & 0xFFFFFFF;
 	des->d0 = des->key56 & 0xFFFFFFF;
+	ft_printf("des->c0 = {%8.8x}\ndes->d0 = {%8.8x}\n", des->c0, des->d0);
 	while (++i < 16)
 	{
 		shift_to_left_28(&des->c0, &des->d0, i);
 		working_pc2(des, i);
+		ft_printf("key48b = {%16.16llx}\n", des->keys[i]);
 	}
 }
 
@@ -490,6 +555,7 @@ void	resize_message(t_des *des)
 		free(des->message);
 		des->message = temp;
 	}
+	des->output_message = (uint8_t *)ft_strnew(des->size_message + 2);
 }
 
 /*
@@ -531,22 +597,191 @@ void	get_message(t_des *des)
 		working_input_des(des);
 }
 
-void	function_IP(t_des *des)
+/*
+** Функция начальной перестановки IP.
+*/
+uint64_t	function_ip(uint64_t block)
 {
-	
+	uint64_t	result;
+	size_t		i;
+	uint8_t		*ip;
+
+	i = -1;
+	result = 0;
+	ip = get_ip();
+	while (++i < 64)
+	{
+		result = result << 1;
+		result = result | ((block >> (ip[63 - i] - 1)) & 0x1);
+	}
+	return (result);
+}
+
+/*
+** Функция расширения 32-х битового вестора до 48 бит.
+** Дублирует некоторые биты.
+*/
+uint64_t	function_e(uint32_t right)
+{
+	uint64_t	rezult;
+	int			i;
+	uint8_t		*e;
+
+	e = get_e();
+	rezult = 0;
+	i = -1;
+	while (++i < 48)
+	{
+		rezult = rezult << 1;
+		rezult = rezult | ((right >> (e[47 - i] - 1)) & 0x1);
+	}
+	return (rezult);
+}
+/*
+** Возвращает число из таблицы g_s.
+** Первый и последний биты шестибитового числа определяют номер строки в g_s
+** Четыре бита между ними определяют номер столбца.
+*/
+uint8_t	get_number_s(uint64_t val, int i)
+{
+	int	row;
+	int col;
+
+	row = ((val & 0x20) >> 4) | (val & 0x1);
+	col = (val >> 0x1) & 0xF;
+	//ft_printf("i = {%d} row = [%d] col = {%d} g_s = {%d}\n",i, row, col, g_s[i][row][col]);
+	return (g_s[i][row][col]);
+}
+
+/*
+** Функция перестановки P.
+** Меняет биты местами согласно таблице p.
+*/
+uint32_t	function_p(uint32_t val)
+{
+	uint32_t	rezult;
+	uint8_t		*p;
+	int			i;
+
+	i = -1;
+	rezult = 0;
+	p = get_p();
+	while (++i < 32)
+	{
+		rezult = rezult << 1;
+		rezult = rezult | ((val >> (p[31 - i] - 1)) & 0x1);
+	}
+	return (rezult);
+}
+
+/*
+** Основная функция шифрования, функция Фейстеля
+*/
+uint32_t	function_f(uint32_t right, uint64_t key)
+{
+	uint64_t	ex_right;
+	int			i;
+	uint32_t	rezult;
+	uint8_t		bits4_s;
+
+	i = -1;
+	rezult = 0;
+	ex_right = function_e(right);
+	//ft_printf("right = {%llx}\n", right);
+	//ft_printf("ex_right1 = {%llx}\n", ex_right);
+	ex_right = ex_right ^ key;
+	//ft_printf("ex_right = {%llx}\n", ex_right);
+	while (++i < 8)
+	{
+		bits4_s = get_number_s((ex_right >> (6 * i) & 0x3F), i);
+		rezult = rezult << 4;
+		rezult = rezult | bits4_s;
+	}
+	rezult = function_p(rezult);
+	return (rezult);
+}
+
+uint64_t	function_ip_final(uint64_t block)
+{
+	uint64_t	rezult;
+	uint8_t		*ip_final;
+	int			i;
+
+	i = -1;
+	rezult = 0;
+	ip_final = get_ip_final();
+	while (++i < 64)
+	{
+		rezult = rezult << 1;
+		rezult = rezult | ((block >> (ip_final[63 - i] - 1)) & 0x1);
+	}
+	return (rezult);
+}
+
+/*
+** Записывает отктеты из блока в выходную строку.
+*/
+void	write_uint64_to_output_message(t_des *des, uint64_t block, size_t i)
+{
+	size_t	k;
+	int		j;
+
+	j = -1;
+	k = i + 7;
+	while (++j < 8)
+		des->output_message[k--] = ((block >> (j * 8)) & 0xff);
+	print_bits(des->output_message, des->size_message);
+}
+
+/*
+** Возвращет ключ в зависи от шифровки ли дешифровки.
+** -e шифрует, -d дешифрует.
+*/
+uint64_t	get_kye(t_des *des, int i)
+{
+	uint64_t	key;
+
+	if (des->flags[des_e])
+		key = des->keys[i];
+	else
+		key = des->keys[15 - i];
+	return (key);
 }
 
 void	function_des(t_des *des, size_t i)
 {
-	t_block block;
+	uint64_t	block;
+	uint32_t	vars[3];
+	int			iter;
+	uint64_t	key;
 
-	ft_memcpy(block.blocks8, des->message + i, 8);
-	ft_printf("block64 = [%llx]\n", block.block64);
-	ft_printf("block32[0] = [%llx]\n", block.blocks32[0]);
-	ft_printf("block32[1] = [%llx]\n", block.blocks32[1]);
-	print_bits((uint8_t *)(&block.block64), 8);
+	iter = -1;
+	block = string_to_uinit64(des->message + i);
+	ft_printf("block \t[%llx]\n", block);
 	print_bits(des->message + i, 8);
-	print_bits(block.blocks8, 8);
+	block = function_ip(block);
+	ft_printf("block \t[%llx]\n", block);
+	vars[left] = (block >> 32);
+	vars[right] = block & 0xFFFFFFFF;
+	ft_printf("vars[left] \t[%llx]\n", vars[left]);
+	ft_printf("vars[right] \t[%llx]\n", vars[right]);
+	//ft_printf("temp_ip [%llx]\n", block);
+	while (++iter < 16)
+	{
+		key = get_kye(des, iter);
+		vars[temp] = vars[right];
+		vars[right] = vars[left] ^ function_f(vars[right], key);
+		vars[left] = vars[temp];
+	}
+	block = 0;
+	block = vars[left];
+	block = block << 32;
+	block = block | vars[right];
+	block = function_ip_final(block);
+	write_uint64_to_output_message(des, block, i);
+	ft_printf("block21 = {%llx}\n", block);
+	print_bits((uint8_t *)(&block), 8);
+	print_bits(des->output_message + i, 8);
 }
 
 void	run_des(t_des *des)
@@ -556,15 +791,47 @@ void	run_des(t_des *des)
 	i = 0;
 	if (!des->flags[des_k])
 		generate_key(des);
+	ft_printf("keyhex = {%llx}\n", des->key);
+	//print_bits(&des->key, 8);
 	generate_kays(des);
 	get_message(des);
-//	ft_printf("message = [%s] size_message = {%d}\n", des->message, des->size_message);
 	resize_message(des);
+	ft_printf("message = [%s] size_message = {%d}\n", des->message, des->size_message);
 	while (i < des->size_message)
 	{
 		function_des(des, i);
 		i += 8;
 	}
+}
+
+/*
+** Запись в файл.
+*/
+void	write_to_output_file(t_des *des)
+{
+	int		fd;
+	ssize_t	len;
+
+	fd = open(des->output_file, O_WRONLY | O_CREAT | O_TRUNC,
+			  S_IWRITE | S_IREAD);
+	if (fd < 0)
+	{
+		ft_putstr_fd("Error open file: ", 2);
+		sys_err(des->output_file);
+	}
+	len = write(fd, des->output_message, des->size_message);
+	if (len != des->size_message)
+		sys_err("Error write file\n");
+	close(fd);
+}
+
+void	write_output_message(t_des *des)
+{
+	if (des->flags[des_o])
+		write_to_output_file(des);
+	else
+		ft_printf("%s\n", des->output_message);
+		
 }
 
 void	type_des(int ac, const char **av)
@@ -582,5 +849,6 @@ void	type_des(int ac, const char **av)
 	init_des(&des);
 	read_flags_des(&des, ac, av);
 	run_des(&des);
+	write_output_message(&des);
 	deinit_des(&des);
 }
