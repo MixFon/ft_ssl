@@ -2,6 +2,7 @@
 # define DES_H
 
 # include "libft.h"
+# include "base64.h"
 # include "ft_ssl.h"
 
 # define HEX_SYMBOLS "1234567890abcdefABCDEF"

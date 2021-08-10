@@ -54,6 +54,7 @@ t_type	*get_type_programm(void)
 		{type_hashing_algorithms, "sha256"},
 		{type_base64, "base64"},
 		{type_des, "des"},
+		{type_des, "des-ecb"},
 		{0, 0}
 	};
 	

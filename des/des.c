@@ -128,7 +128,7 @@ void	fill_uint64_t_des(uint64_t *number, int ac, const char **av, int *i)
 	if (!is_hex_string(av[*i]))
 		print_error_hex_string(av[*i]);
 	*number = convert_string_to_hex_number(av[*i]);
-	ft_printf("{%10.10llx}\n", *number);
+	//ft_printf("{%10.10llx}\n", *number);
 }
 
 /*
@@ -292,11 +292,11 @@ t_uchar	*first_step(char *password, const uint64_t salt_num)
 
 	i = -1;
 	salt = (t_uchar *)ft_strnew(16);
-	ft_printf("salt_num {%8.8llx}\n", salt_num);
+	//ft_printf("salt_num {%8.8llx}\n", salt_num);
 	while (++i < 8)
 		salt[i] = 0xff & (salt_num >> (64 - (i + 1) * 8));
 	salt[15] = 1;
-	print_bits(salt, 16);
+	//print_bits(salt, 16);
 	u = hmac_md5(password, salt);
 	free(salt);
 	return (u);
@@ -661,7 +661,6 @@ uint8_t	get_number_s(uint64_t val, int i)
 	int	row;
 	int col;
 
-	ft_printf("%2.2llx\n", val << 2);
 	row = ((val & 0x20) >> 4) | (val & 0x1);
 	col = (val >> 0x1) & 0xF;
 	//ft_printf("i = {%d} row = [%d] col = {%d} g_s = {%d}\n",i, row, col, g_s[i][row][col]);
@@ -704,17 +703,13 @@ uint32_t	function_f(uint32_t right, uint64_t key)
 	i = -1;
 	rezult = 0;
 	block48 = function_e(right);
-	//ft_printf("right = {%llx}\n", right);
-	ft_printf("block48 = {%llx}\n", block48);
 	block48 = block48 ^ key;
-	ft_printf("block48 ^ key = {%llx}\n", block48);
 	while (++i < 8)
 	{
 		bits4_s = get_number_s(((block48 >> (6 * (7 - i))) & 0x3F), i);
 		rezult = rezult << 4;
 		rezult = rezult | bits4_s;
 	}
-	ft_printf("rezult_p{%llx}\n", rezult);
 	rezult = function_p(rezult);
 	return (rezult);
 }
@@ -749,7 +744,7 @@ void	write_uint64_to_output_message(t_des *des, uint64_t block, size_t i)
 	k = i + 7;
 	while (++j < 8)
 		des->output_message[k--] = ((block >> (j * 8)) & 0xff);
-	print_bits(des->output_message, des->size_message);
+	//print_bits(des->output_message, des->size_message);
 }
 
 /*
@@ -776,24 +771,15 @@ void	function_des(t_des *des, size_t i)
 
 	iter = -1;
 	block64 = string_to_uinit64(des->message + i);
-	ft_printf("block_mes \t[%llx]\n", block64);
-	//print_bits(des->message + i, 8);
 	block64 = function_ip(block64);
-	ft_printf("block_ip \t[%llx]\n", block64);
 	vars[left] = (block64 >> 32);
 	vars[right] = block64 & 0xFFFFFFFF;
-	ft_printf("vars[left] \t[%llx]\n", vars[left]);
-	ft_printf("vars[right] \t[%llx]\n", vars[right]);
-	//ft_printf("temp_ip [%llx]\n", block);
 	while (++iter < 16)
 	{
 		key = get_kye(des, iter);
 		vars[temp] = vars[right];
 		vars[right] = function_f(vars[right], key) ^ vars[left];
-		//exit(0);
 		vars[left] = vars[temp];
-		ft_printf("left {%llx}\n", vars[left]);
-		ft_printf("right {%llx}\n", vars[right]);
 	}
 	vars[temp] = vars[right];
 	vars[right] = vars[left];
@@ -802,13 +788,37 @@ void	function_des(t_des *des, size_t i)
 	block64 = vars[left];
 	block64 = block64 << 32;
 	block64 = block64 | vars[right];
-	ft_printf("block64_ip_final [%llx]\n", block64);
 	block64 = function_ip_final(block64);
-	ft_printf("block64_ip_final [%llx]\n", block64);
 	write_uint64_to_output_message(des, block64, i);
-	//ft_printf("block21 = {%llx}\n", block);
-	print_bits((uint8_t *)(&block64), 8);
-	print_bits(des->output_message + i, 8);
+}
+
+/*
+** При поднятых флагах -a -d необходимо входной поток расшифровать из base64
+** Это значит, что на фход подается сообщение закодированное по base64.
+*/
+void	decode_base64(t_des *des)
+{
+	t_base64	base;
+	size_t		i;
+	int			size_equel;
+
+	i = des->size_message;
+	size_equel = 0;
+	if (des->flags[des_a] && des->flags[des_d])
+	{
+		while (des->message[--i] == '=')
+			size_equel++;
+		init_base64(&base);
+		//ft_printf("size = {%d}\n", des->size_message);
+		decoding(&base, (char *)des->message, des->size_message);
+		//ft_strdel(((char **)(&des->message)));
+		des->message = (uint8_t *)ft_strnew(base.size_chiphertext);
+		ft_memcpy(des->message, base.chiphertext, base.size_chiphertext);
+		des->size_message = base.size_chiphertext - size_equel;
+		//ft_printf("size = {%d}\n", des->size_message);
+		ft_strdel(((char **)(&base.chiphertext)));
+		deinit_base64(&base);
+	}
 }
 
 void	run_des(t_des *des)
@@ -818,12 +828,10 @@ void	run_des(t_des *des)
 	i = 0;
 	if (!des->flags[des_k])
 		generate_key(des);
-	//ft_printf("keyhex = {%llx}\n", des->key);
-	//print_bits(&des->key, 8);
 	generate_kays(des);
 	get_message(des);
+	decode_base64(des);
 	resize_message(des);
-	//ft_printf("message = [%s] size_message = {%d}\n", des->message, des->size_message);
 	while (i < des->size_message)
 	{
 		function_des(des, i);
@@ -852,12 +860,34 @@ void	write_to_output_file(t_des *des)
 	close(fd);
 }
 
+/*
+** При поднятых флагах -a -e необходимо ВЫХОДНОЙ поток зашифровать по base64
+** Это значит, что на выходе должна быть текс в виде base64 строки.
+*/
+void	encode_base64(t_des *des)
+{
+	t_base64	base;
+
+	if (des->flags[des_a] && des->flags[des_e])
+	{
+		init_base64(&base);
+		encoding(&base, (char *)des->output_message, des->size_message);
+		//ft_strdel(((char **)(&des->output_message)));
+		des->output_message = (uint8_t *)ft_strnew(base.size_chiphertext);
+		ft_memcpy(des->output_message, base.chiphertext, base.size_chiphertext);
+		des->size_message = base.size_chiphertext;
+		ft_strdel(((char **)(&base.chiphertext)));
+		deinit_base64(&base);
+	}
+}
+
 void	write_output_message(t_des *des)
 {
+	encode_base64(des);
 	if (des->flags[des_o])
 		write_to_output_file(des);
 	else
-		ft_printf("%s\n", des->output_message);
+		write(1, des->output_message, des->size_message);
 		
 }
 
@@ -865,14 +895,6 @@ void	type_des(int ac, const char **av)
 {
 	t_des	des;
 
-//	//ft_printf("key = {%s}, str = [%s]", av[2], av[3]);
-//	t_uchar *temp = hmac_md5(av[2], av[3]);
-//	//ARPHSALJUABSGWIEUAEVBXEVKMJRFYHZIBYTASLPEZ
-//	//t_uchar *temp = hmac_md5("ARPHSALJUABSGWIEUAEVBXEVKMJRFYHZIBYTASLPEZ", "JHH");
-//	print_bits(temp, 16);
-//	free(temp);
-//	//ft_printf("{%s}\n", temp);
-//	exit(-1);
 	init_des(&des);
 	read_flags_des(&des, ac, av);
 	run_des(&des);
