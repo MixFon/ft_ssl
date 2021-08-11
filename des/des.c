@@ -230,25 +230,10 @@ void	deinit_des(t_des *des)
 }
 
 /*
-** Заполняет соль на основе буфера.
-*/
-void	fill_salt(t_des *des, const char *buff)
-{
-	int	i;
-
-	i = -1;
-	while (++i < 16)
-	{
-		des->salt = des->salt << 4;
-		des->salt = des->salt | (buff[i] & 0xf);
-	}
-}
-
-/*
 ** Функция генерирует соль.
 ** Открывает файл с белым шумом и читает из него 8 окткетов.
 */
-void	generate_salt(t_des *des)
+void	generate_random64(uint64_t *salt)
 {
 	int		fd;
 	char	buff[8];
@@ -257,10 +242,8 @@ void	generate_salt(t_des *des)
 	fd = open("/dev/random", O_RDONLY);
 	if (fd < 0)
 		sys_err("Error open /dev/rendom");
-	len = read(fd, buff, 8);
+	len = read(fd, (uint8_t *)salt, 8);
 	close(fd);
-	fill_salt(des, buff);
-	des->flags[des_s] = 1;
 }
 
 /*
@@ -275,6 +258,8 @@ void	read_password(t_des *des)
 	one = ft_strdup(getpass("enter des-ecb encryption password:"));
 	if (one == NULL)
 		sys_err("Error malloc");
+	if (*one == '\n')
+		exit(-1);
 	two = ft_strdup(getpass("Verifying - enter des-ecb encryption password:"));
 	if (two == NULL)
 		sys_err("Error malloc");
@@ -373,12 +358,27 @@ void	pbkdf(t_des *des)
 void	generate_key(t_des *des)
 {
 	if (!des->flags[des_s])
-		generate_salt(des);
+	{
+		generate_random64(&des->salt);
+		des->flags[des_s] = 1;
+	}
+	if (!des->flags[des_v])
+	{
+		generate_random64(&des->init_vector);
+		des->flags[des_v] = 1;
+	}
 	if (!des->password)
 		read_password(des);
 	pbkdf(des);
 	if (des->flags[des_w])
-		ft_printf("salt=%8.8llX\nkey=%8.8llX\n", des->salt, des->key);
+	{
+		if (!ft_strcmp(des->mode->mode_name, "des")
+			|| !ft_strcmp(des->mode->mode_name, "des-cbc"))
+			ft_printf("salt=%8.8llX\nkey=%8.8llX\niv =%8.8llX\n",
+				des->salt, des->key, des->init_vector);
+		else
+			ft_printf("salt=%8.8llX\nkey=%8.8llX\n", des->salt, des->key);
+	}
 }
 
 uint8_t	*get_pc1(void)
@@ -762,15 +762,13 @@ uint64_t	get_kye(t_des *des, int i)
 	return (key);
 }
 
-void	function_des(t_des *des, size_t i)
+uint64_t	function_des(t_des *des, uint64_t block64)
 {
-	uint64_t	block64;
 	uint32_t	vars[3];
 	int			iter;
 	uint64_t	key;
 
 	iter = -1;
-	block64 = string_to_uinit64(des->message + i);
 	block64 = function_ip(block64);
 	vars[left] = (block64 >> 32);
 	vars[right] = block64 & 0xFFFFFFFF;
@@ -789,7 +787,7 @@ void	function_des(t_des *des, size_t i)
 	block64 = block64 << 32;
 	block64 = block64 | vars[right];
 	block64 = function_ip_final(block64);
-	write_uint64_to_output_message(des, block64, i);
+	return (block64);
 }
 
 /*
@@ -821,22 +819,87 @@ void	decode_base64(t_des *des)
 	}
 }
 
-void	run_des(t_des *des)
+/*
+** Режим сцепления блоков шифрования.
+** Кождый последуюший блок склаывается по модулю 2 с блоком,
+** вычесленным на предыдущем этапе.
+*/
+void	mode_des_cbc(t_des *des)
 {
-	size_t	i;
+	size_t		i;
+	uint64_t	block64;
 
 	i = 0;
+	while (i < des->size_message)
+	{
+		block64 = string_to_uinit64(des->message + i);
+		if (des->flags[des_e])
+			block64 = block64 ^ des->init_vector;
+		block64 = function_des(des, block64);
+		if (des->flags[des_e])
+			des->init_vector = block64;
+		if (des->flags[des_d])
+			block64 = block64 ^ des->init_vector;
+		write_uint64_to_output_message(des, block64, i);
+		if (des->flags[des_d])
+			des->init_vector = string_to_uinit64(des->message + i);
+		i += 8;
+	}
+}
+
+/*
+** Режим электронной кодовой книги.
+** Все блоки текста шифруются одним ключом.
+*/
+void	mode_des_ecb(t_des *des)
+{
+	size_t		i;
+	uint64_t	block64;
+
+	i = 0;
+	while (i < des->size_message)
+	{
+		block64 = string_to_uinit64(des->message + i);
+		block64 = function_des(des, block64);
+		write_uint64_to_output_message(des, block64, i);
+		i += 8;
+	}
+}
+
+/*
+** Режим электронной кодовой книги.
+** Все блоки текста шифруются одним ключом.
+*/
+void	mode_des3(t_des *des)
+{
+	size_t		i;
+	int			j;
+	uint64_t	block64;
+
+	j = -1;
+	while (++j < 3)
+	{
+		i = 0;
+		while (i < des->size_message)
+		{
+			block64 = string_to_uinit64(des->message + i);
+			block64 = function_des(des, block64);
+			write_uint64_to_output_message(des, block64, i);
+			i += 8;
+		}
+		ft_memcpy(des->message, des->output_message, des->size_message);
+	}
+}
+
+void	run_des(t_des *des)
+{
 	if (!des->flags[des_k])
 		generate_key(des);
 	generate_kays(des);
 	get_message(des);
 	decode_base64(des);
 	resize_message(des);
-	while (i < des->size_message)
-	{
-		function_des(des, i);
-		i += 8;
-	}
+	des->mode->operating_mode(des);
 }
 
 /*
@@ -868,7 +931,7 @@ void	encode_base64(t_des *des)
 {
 	t_base64	base;
 
-	if (des->flags[des_a] && des->flags[des_e])
+	if (des->flags[des_a] && !des->flags[des_d])
 	{
 		init_base64(&base);
 		encoding(&base, (char *)des->output_message, des->size_message);
@@ -888,7 +951,41 @@ void	write_output_message(t_des *des)
 		write_to_output_file(des);
 	else
 		write(1, des->output_message, des->size_message);
-		
+}
+
+t_mode	*get_modes(void)
+{
+	static t_mode	modes[] = {
+		{mode_des_ecb, "des-ecb"},
+		{mode_des_cbc, "des-cbc"},
+		{mode_des_cbc, "des"},
+		{mode_des3, "des3"},
+		{0, 0}
+	};
+
+	return (modes);
+}
+
+/*
+** Определение режима работы алгоритма.
+** Режимы работы:
+** des-ecb - режим электронной книги.
+** des-cbc - режим связных блоков.
+*/
+void	determining_operating_mode(t_des *des, const char **av)
+{
+	t_mode	*modes;
+
+	modes = get_modes();
+	while ((*modes).mode_name != 0)
+	{
+		if (!ft_strcmp(av[1], (*modes).mode_name))
+		{
+			des->mode = modes;
+			return ;
+		}
+		modes++;
+	}
 }
 
 void	type_des(int ac, const char **av)
@@ -896,6 +993,7 @@ void	type_des(int ac, const char **av)
 	t_des	des;
 
 	init_des(&des);
+	determining_operating_mode(&des, av);
 	read_flags_des(&des, ac, av);
 	run_des(&des);
 	write_output_message(&des);

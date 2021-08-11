@@ -9,6 +9,14 @@
 
 # define KDLEN 8
 
+typedef struct s_des t_des;
+
+typedef struct 	s_mode
+{
+	void		(*operating_mode)(t_des *des);
+	const char	*mode_name;
+}				t_mode;
+
 typedef struct s_des
 {
 	int			flags[10];
@@ -25,6 +33,7 @@ typedef struct s_des
 	uint64_t	init_vector;
 	uint32_t	c0;
 	uint32_t	d0;
+	t_mode		*mode;
 }				t_des;
 
 enum e_des

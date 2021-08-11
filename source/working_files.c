@@ -55,6 +55,8 @@ t_type	*get_type_programm(void)
 		{type_base64, "base64"},
 		{type_des, "des"},
 		{type_des, "des-ecb"},
+		{type_des, "des-cbc"},
+		{type_des, "des3"},
 		{0, 0}
 	};
 	

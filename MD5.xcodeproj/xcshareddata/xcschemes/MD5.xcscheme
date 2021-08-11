@@ -60,7 +60,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "des -k 5067E59B32456EA4 -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/Makefile -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -e -a"
+            argument = "des-ecb -k 5067E59B32456EA4 -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/Makefile -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -e -a"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
