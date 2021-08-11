@@ -352,6 +352,25 @@ void	pbkdf(t_des *des)
 	fill_key(des, result);
 }
 
+void	generate_init_vector(t_des *des)
+{
+	if (!des->flags[des_v])
+	{
+		generate_random64(&des->init_vector);
+		des->flags[des_v] = 1;
+	}
+	if (des->flags[des_w])
+	{
+		if (!ft_strcmp(des->mode->mode_name, "des")
+			|| !ft_strcmp(des->mode->mode_name, "des-cbc")
+			|| !ft_strcmp(des->mode->mode_name, "des3"))
+			ft_printf("salt=%8.8llX\nkey=%8.8llX\niv =%8.8llX\n",
+				des->salt, des->key, des->init_vector);
+		else
+			ft_printf("salt=%8.8llX\nkey=%8.8llX\n", des->salt, des->key);
+	}
+}
+
 /*
 ** Функция генерирует ключ по алгоритму PBKDS
 */
@@ -362,23 +381,9 @@ void	generate_key(t_des *des)
 		generate_random64(&des->salt);
 		des->flags[des_s] = 1;
 	}
-	if (!des->flags[des_v])
-	{
-		generate_random64(&des->init_vector);
-		des->flags[des_v] = 1;
-	}
 	if (!des->password)
 		read_password(des);
 	pbkdf(des);
-	if (des->flags[des_w])
-	{
-		if (!ft_strcmp(des->mode->mode_name, "des")
-			|| !ft_strcmp(des->mode->mode_name, "des-cbc"))
-			ft_printf("salt=%8.8llX\nkey=%8.8llX\niv =%8.8llX\n",
-				des->salt, des->key, des->init_vector);
-		else
-			ft_printf("salt=%8.8llX\nkey=%8.8llX\n", des->salt, des->key);
-	}
 }
 
 uint8_t	*get_pc1(void)
@@ -875,18 +880,29 @@ void	mode_des3(t_des *des)
 	size_t		i;
 	int			j;
 	uint64_t	block64;
+	uint64_t	old_int_vector;
 
 	j = -1;
+	old_int_vector = des->init_vector;
 	while (++j < 3)
 	{
 		i = 0;
 		while (i < des->size_message)
 		{
 			block64 = string_to_uinit64(des->message + i);
+			if (des->flags[des_e])
+				block64 = block64 ^ des->init_vector;
 			block64 = function_des(des, block64);
+			if (des->flags[des_e])
+				des->init_vector = block64;
+			if (des->flags[des_d])
+				block64 = block64 ^ des->init_vector;
 			write_uint64_to_output_message(des, block64, i);
+			if (des->flags[des_d])
+				des->init_vector = string_to_uinit64(des->message + i);
 			i += 8;
 		}
+		des->init_vector = old_int_vector;
 		ft_memcpy(des->message, des->output_message, des->size_message);
 	}
 }
@@ -895,6 +911,7 @@ void	run_des(t_des *des)
 {
 	if (!des->flags[des_k])
 		generate_key(des);
+	generate_init_vector(des);
 	generate_kays(des);
 	get_message(des);
 	decode_base64(des);

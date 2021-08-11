@@ -117,7 +117,7 @@ count_error=0
 count=$start_range
 
 echo "$YELLOW Test DES-CBC $WHITE"
-echo "$YELLOW Test encoding-decoding $WHITE"
+echo "$YELLOW Test encoding-decoding -v (vect) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
@@ -150,7 +150,7 @@ count_error=0
 
 count=$start_range
 
-echo "$YELLOW Test encoding-decoding with -a (base64) $WHITE"
+echo "$YELLOW Test encoding-decoding with -a (base64) -v (vect) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
