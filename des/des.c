@@ -323,7 +323,7 @@ uint64_t	string_to_uinit64(uint8_t *message)
 void	fill_key(t_des *des, t_uchar *result)
 {
 	des->key = string_to_uinit64(result);
-	des->flags[des_k] = 1;
+	//des->flags[des_k] = 1;
 }
 
 /*
@@ -372,13 +372,44 @@ void	generate_init_vector(t_des *des)
 }
 
 /*
+** Считывает соль из входного сообщения.
+** В начале сообщения должно идти сообщение Salted__8октетов_соли
+*/
+void	read_salt_from_input_massage(t_des *des)
+{
+	int		i;
+//	uint8_t	*new;
+
+	i = -1;
+	if (ft_memcmp(des->message, "Salted__", 8))
+		sys_err("bad magic number\n");
+	if (des->size_message < 16)
+		sys_err("error reading input file\n");
+	des->salt = 0;
+	while (++i < 8)
+	{
+		des->salt = des->salt << 8;
+		des->salt = des->salt | (des->message[i + 8] & 0xff);
+	}
+//	new = (uint8_t *)ft_strnew(des->size_message);
+//	des->size_message -= 16;
+//	ft_memcpy(new, des->message + 16, des->size_message);
+//	free(des->message);
+//	des->message = new;
+//	//print_bits(new, des->size_message);
+}
+
+/*
 ** Функция генерирует ключ по алгоритму PBKDS
 */
 void	generate_key(t_des *des)
 {
 	if (!des->flags[des_s])
 	{
-		generate_random64(&des->salt);
+		if (des->flags[des_d])
+			read_salt_from_input_massage(des);
+		else
+			generate_random64(&des->salt);
 		des->flags[des_s] = 1;
 	}
 	if (!des->password)
@@ -906,15 +937,33 @@ void	mode_des3(t_des *des)
 		ft_memcpy(des->message, des->output_message, des->size_message);
 	}
 }
+/*
+** В режиме дешифрования подразумевается, что соль вписана в начале сррбщения.
+** Пропускаем эту информаци, которая занимает 16 октетов.
+*/
+void	skip_16_octets(t_des *des)
+{
+	uint8_t	*new;
+	
+	if (des->flags[des_d])
+	{
+		new = (uint8_t *)ft_strnew(des->size_message);
+		des->size_message -= 16;
+		ft_memcpy(new, des->message + 16, des->size_message);
+		free(des->message);
+		des->message = new;
+	}
+}
 
 void	run_des(t_des *des)
 {
-	if (!des->flags[des_k])
-		generate_key(des);
-	generate_init_vector(des);
-	generate_kays(des);
 	get_message(des);
 	decode_base64(des);
+	if (!des->flags[des_k])
+		generate_key(des);
+	skip_16_octets(des);
+	generate_init_vector(des);
+	generate_kays(des);
 	resize_message(des);
 	des->mode->operating_mode(des);
 }
@@ -961,8 +1010,30 @@ void	encode_base64(t_des *des)
 	}
 }
 
+void	add_salt_to_output_message(t_des *des)
+{
+	uint8_t	*new;
+	int		i;
+
+	i = -1;
+	if (!des->flags[des_k] && !des->flags[des_d])
+	{
+		new = (uint8_t *)ft_strnew(des->size_message + 20);
+		ft_memcpy(new, "Salted__", 8);
+		while (++i < 8)
+			new[i + 8] = (des->salt >> (7 - i) * 8) & 0xff;
+		//ft_memcpy(new + 8, &des->salt, 8);
+		ft_memcpy(new + 16, &des->output_message, des->size_message);
+		free(des->output_message);
+		des->output_message = new;
+		des->size_message += 16;
+		//print_bits(des->output_message, des->size_message);
+	}
+}
+
 void	write_output_message(t_des *des)
 {
+	add_salt_to_output_message(des);
 	encode_base64(des);
 	if (des->flags[des_o])
 		write_to_output_file(des);

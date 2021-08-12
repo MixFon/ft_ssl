@@ -3,7 +3,7 @@
 count_ok=0
 count_error=0
 
-end_range=101
+end_range=11
 start_range=1
 
 count=$start_range
