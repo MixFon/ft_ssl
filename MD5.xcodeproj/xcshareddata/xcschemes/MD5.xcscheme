@@ -60,12 +60,12 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "des-ecb -k 5067E59B32456EA4 -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/Makefile -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -e -a"
-            isEnabled = "NO">
+            argument = "des-ecb -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/Makefile -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -e -p Hello -s 7FE3FC4BB60A6925"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "des-ecb  -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/Makefile -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -e -a"
-            isEnabled = "YES">
+            argument = "des-ecb  -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/Makefile -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -d -p Hello -s 7FE3FC4BB60A6925"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "des -k 5067E59B32456EA4 -i /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/out_file -o /Users/mixfon/MyFiles/ConsoleFiles/ft_ssl/decode -d -a"

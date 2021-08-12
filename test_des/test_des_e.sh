@@ -13,11 +13,13 @@ GREEN="\033[1;32m"
 RED="\033[1;31m"
 WHITE="\033[1;37m"
 RESET="\033[0;0m"
+BLUE="\x1b[34m"
+MAGENTA="\x1b[35m"
 CLEAR_SCREEN="\033[2J"
 CLEAR_LINE="\033[2K\c"
 
-echo "$YELLOW Test DES-ECB $WHITE"
-echo "$YELLOW Test encoding-decoding $WHITE"
+echo "$MAGENTA Test DES-ECB $WHITE"
+echo "$YELLOW Test encoding-decoding -k (key) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
@@ -41,15 +43,15 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE"
-echo "$RED \t$count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+
 #----------------------------------------------------------------
 count_ok=0
 count_error=0
 
 count=$start_range
 
-echo "$YELLOW Test encoding-decoding with -a (base64) $WHITE"
+echo "$YELLOW Test encoding-decoding -a (base64) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
@@ -73,8 +75,7 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE"
-echo "$RED \t$count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 #----------------------------------------------------------------
 count_ok=0
@@ -82,7 +83,38 @@ count_error=0
 
 count=$start_range
 
-echo "$YELLOW Test encoding-decoding with -s (salt) -p (password) $WHITE"
+echo "$YELLOW Test encoding-decoding -p (password) $WHITE"
+while [[ count -lt end_range ]]
+do
+	str=$(cat /dev/random | base64 | head -c $count )
+	password=$(cat /dev/random | base64 | head -c 64 )
+	one=$(echo $str | ./ft_ssl des-ecb -e -p $password -o /tmp/file -a) 
+	two=$(./ft_ssl des-ecb -d -p $password -i /tmp/file -a)
+	# echo "-----"
+	if [ "$str" = "$two" ]
+	then
+		echo "   " $CLEAR_LINE
+		echo "$GREEN $count OK $RESET\r\c"
+		let count_ok=$count_ok+1
+	else
+		echo $CLEAR_LINE
+		echo "$RED $count KO $RESET" ; echo "## string: " 
+		echo "[$str]"
+		echo "{$two}"
+		let count_error=$count_error+1
+	fi
+	let count=$count+1
+done
+echo $CLEAR_LINE
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+
+#----------------------------------------------------------------
+count_ok=0
+count_error=0
+
+count=$start_range
+
+echo "$YELLOW Test encoding-decoding -s (salt) -p (password) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
@@ -106,8 +138,7 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE"
-echo "$RED \t$count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 #------------------------- DES-CBC ------------------------------
 #----------------------------------------------------------------
@@ -116,8 +147,8 @@ count_error=0
 
 count=$start_range
 
-echo "$YELLOW Test DES-CBC $WHITE"
-echo "$YELLOW Test encoding-decoding -v (vect) $WHITE"
+echo "$MAGENTA Test DES-CBC $WHITE"
+echo "$YELLOW Test encoding-decoding -k (key) -v (vect) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
@@ -142,15 +173,15 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE"
-echo "$RED \t$count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+
 #----------------------------------------------------------------
 count_ok=0
 count_error=0
 
 count=$start_range
 
-echo "$YELLOW Test encoding-decoding with -a (base64) -v (vect) $WHITE"
+echo "$YELLOW Test encoding-decoding -a (base64) -v (vect) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
@@ -175,8 +206,7 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE"
-echo "$RED \t$count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 #----------------------------------------------------------------
 count_ok=0
@@ -184,7 +214,39 @@ count_error=0
 
 count=$start_range
 
-echo "$YELLOW Test encoding-decoding with -s (salt) -p (password) -v (vect) $WHITE"
+echo "$YELLOW Test encoding-decoding -a (base64) -p (password) -v (vec) $WHITE"
+while [[ count -lt end_range ]]
+do
+	str=$(cat /dev/random | base64 | head -c $count )
+	pass=$(cat /dev/random | base64 | head -c 64 )
+	iv=$(echo $salt | md5)
+	one=$(echo $str | ./ft_ssl des-cbc -e -p $pass -v $iv -o /tmp/file -a) 
+	two=$(			  ./ft_ssl des-cbc -d -p $pass -v $iv -i /tmp/file -a)
+	# echo "-----"
+	if [ "$str" = "$two" ]
+	then
+		echo "   " $CLEAR_LINE
+		echo "$GREEN $count OK $RESET\r\c"
+		let count_ok=$count_ok+1
+	else
+		echo $CLEAR_LINE
+		echo "$RED $count KO $RESET" ; echo "## string: " 
+		echo "[$str]"
+		echo "{$two}"
+		let count_error=$count_error+1
+	fi
+	let count=$count+1
+done
+echo $CLEAR_LINE
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+
+#----------------------------------------------------------------
+count_ok=0
+count_error=0
+
+count=$start_range
+
+echo "$YELLOW Test encoding-decoding -s (salt) -p (password) -v (vect) $WHITE"
 while [[ count -lt end_range ]]
 do
 	str=$(cat /dev/random | base64 | head -c $count )
@@ -209,6 +271,5 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE"
-echo "$RED \t$count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 

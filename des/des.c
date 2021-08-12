@@ -218,6 +218,8 @@ void	read_flags_des(t_des *des, int ac, const char **av)
 	}
 	if (des->flags[des_d] && des->flags[des_e])
 		print_error_des("\0");
+	if (!des->flags[des_d] && !des->flags[des_e])
+		des->flags[des_e] = 1;
 }
 
 void	deinit_des(t_des *des)
@@ -236,7 +238,6 @@ void	deinit_des(t_des *des)
 void	generate_random64(uint64_t *salt)
 {
 	int		fd;
-	char	buff[8];
 	ssize_t	len;
 
 	fd = open("/dev/random", O_RDONLY);
@@ -412,8 +413,6 @@ void	generate_key(t_des *des)
 			generate_random64(&des->salt);
 		des->flags[des_s] = 1;
 	}
-	if (!des->password)
-		read_password(des);
 	pbkdf(des);
 }
 
@@ -945,8 +944,9 @@ void	skip_16_octets(t_des *des)
 {
 	uint8_t	*new;
 	
-	if (des->flags[des_d])
+	if (!des->flags[des_k] && des->flags[des_d])
 	{
+		//ft_printf("Helo\n");
 		new = (uint8_t *)ft_strnew(des->size_message);
 		des->size_message -= 16;
 		ft_memcpy(new, des->message + 16, des->size_message);
@@ -957,6 +957,8 @@ void	skip_16_octets(t_des *des)
 
 void	run_des(t_des *des)
 {
+	if (!des->password && !des->flags[des_k])
+		read_password(des);
 	get_message(des);
 	decode_base64(des);
 	if (!des->flags[des_k])
@@ -1010,6 +1012,10 @@ void	encode_base64(t_des *des)
 	}
 }
 
+/*
+** В режиме шифрования, в начало сообщения добавляется Salted__8октетов_соли
+** Если не задан ключ.
+*/
 void	add_salt_to_output_message(t_des *des)
 {
 	uint8_t	*new;
@@ -1023,7 +1029,7 @@ void	add_salt_to_output_message(t_des *des)
 		while (++i < 8)
 			new[i + 8] = (des->salt >> (7 - i) * 8) & 0xff;
 		//ft_memcpy(new + 8, &des->salt, 8);
-		ft_memcpy(new + 16, &des->output_message, des->size_message);
+		ft_memcpy(new + 16, des->output_message, des->size_message);
 		free(des->output_message);
 		des->output_message = new;
 		des->size_message += 16;
@@ -1059,6 +1065,7 @@ t_mode	*get_modes(void)
 ** Режимы работы:
 ** des-ecb - режим электронной книги.
 ** des-cbc - режим связных блоков.
+** des3 - троекратный des
 */
 void	determining_operating_mode(t_des *des, const char **av)
 {
