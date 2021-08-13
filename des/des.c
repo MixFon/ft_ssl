@@ -871,25 +871,38 @@ void	mode_des_cfb(t_des *des)
 {
 	size_t		i;
 	uint64_t	block64;
-	uint64_t	planetext;
+	uint64_t	chipher;
 
 	i = 0;
 	while (i < des->size_message)
 	{
-		block64 = function_des(des, des->init_vector);
-		if (des->flags[des_e])
-		{
-			block64 = block64 ^ string_to_uinit64(des->message + i);
-			des->init_vector = block64;
-		}
-		if (des->flags[des_d])
-		{
-			planetext = string_to_uinit64(des->message + i);
-			//ft_memcpy(&planetext, des->message + i, 8);
-			block64 = planetext ^ block64;
-			des->init_vector = planetext;
-		}
-		write_uint64_to_output_message(des, block64, i);
+//		chipher = string_to_uinit64(des->message + i);
+//		des->init_vector = function_des(des, des->init_vector);
+//		des->init_vector ^= chipher;
+//		if (des->flags[des_d])
+//		{
+//			ft_printf("{%llx}\n", des->init_vector);
+//			print_bits(&des->init_vector, 8);
+//		}
+//		write_uint64_to_output_message(des, des->init_vector , i);
+//		des->init_vector = chipher;
+//		if (des->flags[des_e])
+//		{
+//			block64 = block64 ^ string_to_uinit64(des->message + i);
+//			des->init_vector = block64;
+//		}
+//		if (des->flags[des_d])
+//		{
+//			chipher = string_to_uinit64(des->message + i);
+//			//ft_memcpy(&planetext, des->message + i, 8);
+//			block64 = chipher ^ block64;
+//			print_bits((uint8_t *)&block64, 8);
+//			ft_printf("{%llx}\n", block64);
+//			ft_printf("{%llx}\n", chipher);
+//			exit(0);
+//			des->init_vector = chipher;
+//		}
+//		write_uint64_to_output_message(des, block64, i);
 		i += 8;
 	}
 }
@@ -906,7 +919,12 @@ void	mode_des_ofb(t_des *des)
 	i = 0;
 	while (i < des->size_message)
 	{
+		//des->flags[des_e] = 1;
+		if (des->flags[des_e] == 1)
+			des->flags[des_d] = 0;
 		block64 = function_des(des, des->init_vector);
+		if (des->flags[des_e] == 1)
+			des->flags[des_d] = 1;
 		des->init_vector = block64;
 		plaintext = string_to_uinit64(des->message + i);
 		block64 = block64 ^ plaintext;
