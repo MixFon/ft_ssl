@@ -256,12 +256,14 @@ void	read_password(t_des *des)
 	char	*one;
 	char	*two;
 
-	one = ft_strdup(getpass("enter des-ecb encryption password:"));
+	ft_printf("enter %s encryption password:", des->mode->mode_name);
+	one = ft_strdup(getpass(""));
 	if (one == NULL)
 		sys_err("Error malloc");
 	if (*one == '\n')
 		exit(-1);
-	two = ft_strdup(getpass("Verifying - enter des-ecb encryption password:"));
+	ft_printf("Verifying - enter %s encryption password:", des->mode->mode_name);
+	two = ft_strdup(getpass(""));
 	if (two == NULL)
 		sys_err("Error malloc");
 	if (ft_strcmp(one, two))
@@ -319,7 +321,7 @@ uint64_t	string_to_uinit64(uint8_t *message)
 }
 
 /*
-** Переволит ключ в виде строки в число.
+** Переволит ключ в виде строки 8 октктов в 64 битное число.
 */
 void	fill_key(t_des *des, t_uchar *result)
 {
@@ -362,9 +364,7 @@ void	generate_init_vector(t_des *des)
 	}
 	if (des->flags[des_w])
 	{
-		if (!ft_strcmp(des->mode->mode_name, "des")
-			|| !ft_strcmp(des->mode->mode_name, "des-cbc")
-			|| !ft_strcmp(des->mode->mode_name, "des3"))
+		if (ft_strcmp(des->mode->mode_name, "des-ecb"))
 			ft_printf("salt=%8.8llX\nkey=%8.8llX\niv =%8.8llX\n",
 				des->salt, des->key, des->init_vector);
 		else
@@ -431,17 +431,9 @@ uint8_t	*get_pc1(void)
 uint8_t	*get_pc2(void)
 {
 	static uint8_t	pc2[] = {
-		14, 17, 11, 24, 1, 5,
-		3, 28, 15, 6, 21, 10,
-		23, 19, 12, 4, 26, 8,
-		16, 7, 27, 20, 13, 2,
-		41, 52, 31, 37, 47, 55,
-		30, 40, 51, 45, 33, 48,
-		44, 49, 39, 56, 34, 53,
-		46, 42, 50, 36, 29, 32
-//		14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4,
-//		26, 8, 16, 7, 27, 20, 13, 2, 41, 52, 31, 37, 47, 55, 30, 40,
-//		51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32
+		14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4,
+		26, 8, 16, 7, 27, 20, 13, 2, 41, 52, 31, 37, 47, 55, 30, 40,
+		51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32
 	};
 
 	return (pc2);
@@ -855,6 +847,103 @@ void	decode_base64(t_des *des)
 }
 
 /*
+** Самай простой режим шифрования.
+** Данный режим не обладает приптоскойстью.
+*/
+void	mode_simple(t_des *des)
+{
+	size_t		i;
+	uint64_t	block64;
+
+	i = 0;
+	while (i < des->size_message)
+	{
+		block64 = string_to_uinit64(des->message + i) ^ des->key;
+		write_uint64_to_output_message(des, block64, i);
+		i += 8;
+	}
+}
+
+/*
+** Режим обратной связи по выходу.
+*/
+void	mode_des_cfb(t_des *des)
+{
+	size_t		i;
+	uint64_t	block64;
+
+	i = 0;
+	while (i < des->size_message)
+	{
+		block64 = function_des(des, des->init_vector);
+		if (des->flags[des_e])
+		{
+			block64 = block64 ^ string_to_uinit64(des->message + i);
+			des->init_vector = block64;
+		}
+		else
+		{
+			des->init_vector = string_to_uinit64(des->message + i);
+			block64 = block64 ^ des->init_vector;
+		}
+		write_uint64_to_output_message(des, block64, i);
+		i += 8;
+	}
+}
+
+/*
+** Режим обратной связи по выходу.
+*/
+void	mode_des_ofb(t_des *des)
+{
+	size_t		i;
+	uint64_t	block64;
+	uint64_t	plaintext;
+
+	i = 0;
+	while (i < des->size_message)
+	{
+		block64 = function_des(des, des->init_vector);
+		des->init_vector = block64;
+		plaintext = string_to_uinit64(des->message + i);
+		block64 = block64 ^ plaintext;
+		write_uint64_to_output_message(des, block64, i);
+		i += 8;
+	}
+}
+
+/*
+** Режим распространяющегося сцепления блока шифка.
+** Предыдущий блок открытого текста и предыдущий блок шифротекста
+** подвергаются операции XOR с текущим блоком открытого текста перед
+** шифрование или после него.
+*/
+void	mode_des_pcbc(t_des *des)
+{
+	size_t		i;
+	uint64_t	block64;
+	uint64_t	plaintext64;
+
+	i = 0;
+	while (i < des->size_message)
+	{
+		block64 = string_to_uinit64(des->message + i);
+		plaintext64 = block64;
+		if (des->flags[des_e])
+			block64 = block64 ^ des->init_vector;
+		block64 = function_des(des, block64);
+		if (des->flags[des_e])
+			des->init_vector = block64 ^ plaintext64;
+		if (des->flags[des_d])
+			block64 = block64 ^ des->init_vector;
+		write_uint64_to_output_message(des, block64, i);
+		if (des->flags[des_d])
+			des->init_vector = block64 ^ plaintext64;
+		i += 8;
+	}
+}
+
+/*
 ** Режим сцепления блоков шифрования.
 ** Кождый последуюший блок склаывается по модулю 2 с блоком,
 ** вычесленным на предыдущем этапе.
@@ -902,8 +991,8 @@ void	mode_des_ecb(t_des *des)
 }
 
 /*
-** Режим электронной кодовой книги.
-** Все блоки текста шифруются одним ключом.
+** Режим тройного des.
+** Троекратное выполнение алгоритма des.
 */
 void	mode_des3(t_des *des)
 {
@@ -936,6 +1025,7 @@ void	mode_des3(t_des *des)
 		ft_memcpy(des->message, des->output_message, des->size_message);
 	}
 }
+
 /*
 ** В режиме дешифрования подразумевается, что соль вписана в начале сррбщения.
 ** Пропускаем эту информаци, которая занимает 16 октетов.
@@ -957,7 +1047,7 @@ void	skip_16_octets(t_des *des)
 
 void	run_des(t_des *des)
 {
-	if (!des->password && !des->flags[des_k])
+	if (!des->flags[des_p] && !des->flags[des_k])
 		read_password(des);
 	get_message(des);
 	decode_base64(des);
@@ -1054,6 +1144,10 @@ t_mode	*get_modes(void)
 		{mode_des_cbc, "des-cbc"},
 		{mode_des_cbc, "des"},
 		{mode_des3, "des3"},
+		{mode_des_pcbc, "des-pcbc"},
+		{mode_des_ofb, "des-ofb"},
+		{mode_des_cfb, "des-cfb"},
+		{mode_simple, "simple"},
 		{0, 0}
 	};
 
