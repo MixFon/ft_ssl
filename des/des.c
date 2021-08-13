@@ -871,6 +871,7 @@ void	mode_des_cfb(t_des *des)
 {
 	size_t		i;
 	uint64_t	block64;
+	uint64_t	planetext;
 
 	i = 0;
 	while (i < des->size_message)
@@ -881,10 +882,12 @@ void	mode_des_cfb(t_des *des)
 			block64 = block64 ^ string_to_uinit64(des->message + i);
 			des->init_vector = block64;
 		}
-		else
+		if (des->flags[des_d])
 		{
-			des->init_vector = string_to_uinit64(des->message + i);
-			block64 = block64 ^ des->init_vector;
+			planetext = string_to_uinit64(des->message + i);
+			//ft_memcpy(&planetext, des->message + i, 8);
+			block64 = planetext ^ block64;
+			des->init_vector = planetext;
 		}
 		write_uint64_to_output_message(des, block64, i);
 		i += 8;

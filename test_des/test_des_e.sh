@@ -3,8 +3,8 @@
 count_ok=0
 count_error=0
 
-end_range=10
-start_range=1
+end_range=1000
+start_range=990
 
 count=$start_range
 
@@ -910,8 +910,8 @@ do
 	str=$(cat /dev/random | base64 | head -c $count )
 	key=$(echo $str | md5)
 	iv=$(echo $key | md5)
-	one=$(echo $str | ./ft_ssl des-cfb -e -k $key -v $iv -o /tmp/file)
-	two=$(			  ./ft_ssl des-cfb -d -k $key -v $iv -i /tmp/file)
+	one=$(echo $str | ./ft_ssl des-cfb -e -a -k $key -v $iv -o /tmp/file)
+	two=$(			  ./ft_ssl des-cfb -d -a -k $key -v $iv -i /tmp/file)
 	if [ "$str" = "$two" ]
 	then
 		echo "   " $CLEAR_LINE
@@ -930,6 +930,7 @@ done
 echo $CLEAR_LINE
 echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
+exit
 #----------------------------------------------------------------
 count_ok=0
 count_error=0
