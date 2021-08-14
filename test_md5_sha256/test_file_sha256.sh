@@ -5,7 +5,7 @@ count=0
 while [[ count -lt 30 ]]
 do
 	echo $count
-	str=$(echo $count | python3  generate_string.py)
+	str=$(cat /dev/random | base64 | head -c $count )
 	echo $str > temp
 	one=$(./ft_ssl sha256 -r temp)
 	two=$(shasum -a 256 temp)

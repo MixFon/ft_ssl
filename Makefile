@@ -6,7 +6,7 @@
 #    By: widraugr <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/29 13:07:44 by widraugr          #+#    #+#              #
-#    Updated: 2021/08/14 10:07:54 by mixfon           ###   ########.fr        #
+#    Updated: 2021/08/14 14:45:48 by mixfon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -88,38 +88,79 @@ OBJHMAC = $(addprefix $(DIROBJ), $(FILE_HMAC:.c=.o))
 all : $(NAME)
 
 $(NAME): $(DIROBJ) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64) $(OBJDES) $(OBJHMAC)
-	make -C $(LIBDIR)
-	gcc $(FLAGS) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64) $(OBJDES) $(OBJHMAC) $(FLIB) -o $(NAME)
+	@make -C $(LIBDIR)
+	@gcc $(FLAGS) $(OBJ) $(OBJMD5) $(OBJSHA256) $(OBJBASE64) $(OBJDES) $(OBJHMAC) $(FLIB) -o $(NAME)
+	@tput el
+	@tput setaf 2
+	@echo "$(NAME) builded successful!"
+	@tput cnorm
+	@tput sgr0
 
 $(DIROBJ)%.o : $(DIRC)%.c
-	gcc $(FLAGS) -c $< -o $@
+	@tput civis
+	@tput sc
+	@gcc $(FLAGS) -c $< -o $@ 
+	@tput setaf 2
+	@echo -n $<
+	@tput el
+	@tput rc
 
 $(DIROBJ)%.o : $(DIRMD5)%.c
-	gcc $(FLAGS) -c $< -o $@
+	@tput civis
+	@tput sc
+	@gcc $(FLAGS) -c $< -o $@ 
+	@tput setaf 2
+	@echo -n $<
+	@tput el
+	@tput rc
 
 $(DIROBJ)%.o : $(DIRSHA256)%.c
-	gcc $(FLAGS) -c $< -o $@
+	@tput civis
+	@tput sc
+	@gcc $(FLAGS) -c $< -o $@ 
+	@tput setaf 2
+	@echo -n $<
+	@tput el
+	@tput rc
 
 $(DIROBJ)%.o : $(DIRBASE64)%.c
-	gcc $(FLAGS) -c $< -o $@
+	@tput civis
+	@tput sc
+	@gcc $(FLAGS) -c $< -o $@ 
+	@tput setaf 2
+	@echo -n $<
+	@tput el
+	@tput rc
 
 $(DIROBJ)%.o : $(DIRDES)%.c
-	gcc $(FLAGS) -c $< -o $@
+	@tput civis
+	@tput sc
+	@gcc $(FLAGS) -c $< -o $@ 
+	@tput setaf 2
+	@echo -n $<
+	@tput el
+	@tput rc
 
 $(DIROBJ)%.o : $(DIRHMAC)%.c
-	gcc $(FLAGS) -c $< -o $@
+	@tput civis
+	@tput sc
+	@gcc $(FLAGS) -c $< -o $@ 
+	@tput setaf 2
+	@echo -n $<
+	@tput el
+	@tput rc
 
 $(DIROBJ):
-	mkdir -p $(DIROBJ)
+	@mkdir -p $(DIROBJ)
 
 clean:
-	/bin/rm -rf $(DIROBJ)
-	make clean -C $(LIBDIR)
+	@/bin/rm -rf $(DIROBJ)
+	@make clean -C $(LIBDIR)
 	
 fclean: clean
-	/bin/rm -f $(NAME)
-	/bin/rm -rf *.dSYM
-	make fclean -C $(LIBDIR)
+	@/bin/rm -f $(NAME)
+	@/bin/rm -rf *.dSYM
+	@make fclean -C $(LIBDIR)
 	
 re: fclean all 
 

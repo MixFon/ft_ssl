@@ -5,7 +5,7 @@ count=0
 while [[ count -lt 30 ]]
 do
 	echo $count
-	str=$(echo $count | python3 generate_string.py)
+	str=$(cat /dev/random | base64 | head -c $count )
 	one=$(./ft_ssl md5 -r -s $str)
 	two=$(md5 -r -s $str)
 	# echo "-----"
