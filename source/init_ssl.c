@@ -12,10 +12,19 @@ void	init_ssl(t_ssl *ssl)
 
 void	help(void)
 {
-	ft_putstr_fd("Commands:\n", 2);
+	ft_putstr_fd("\nHashing algorithms:\n", 2);
 	ft_putstr_fd("md5\nsha256\n", 2);
-	ft_putstr_fd("\nFlags:\n", 2);
-	ft_putstr_fd("-p\n-q\n-r\n-s\n", 2);
+	ft_putstr_fd("\nCipher commands:\n", 2);
+	ft_putstr_fd("base64\n", 2);
+	ft_putstr_fd("des\n", 2);
+	ft_putstr_fd("des-ecb\n", 2);
+	ft_putstr_fd("des-cbc\n", 2);
+	ft_putstr_fd("des3\n", 2);
+	ft_putstr_fd("des-pcbc\n", 2);
+	ft_putstr_fd("des-ofb\n", 2);
+	ft_putstr_fd("des-cfb\n", 2);
+	ft_putstr_fd("des-ctr\n", 2);
+	ft_putstr_fd("simple\n", 2);
 	exit(-1);
 }
 
