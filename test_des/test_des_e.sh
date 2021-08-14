@@ -18,9 +18,6 @@ MAGENTA="\x1b[35m"
 CLEAR_SCREEN="\033[2J"
 CLEAR_LINE="\033[2K\c"
 
-echo $#
-echo $1
-
 base64_set=0
 des_set=0
 des3_set=0
@@ -29,6 +26,7 @@ des_cbc_set=0
 des_pcbc_set=0
 des_ofb_set=0
 des_cfb_set=0
+des_ctr_set=0
 simple_set=0
 
 function print_usage {
@@ -42,6 +40,7 @@ function print_usage {
 	echo "                 des_pcbc"
 	echo "                 des_ofb"
 	echo "                 des_cfb"
+	echo "                 des_ctr"
 	echo "                 simple"
 	echo "                 all"
 }
@@ -77,6 +76,9 @@ for arg in "$@" ; do
 		des_cfb)
 			des_cfb_set=1
 			;;
+		des_ctr)
+			des_ctr_set=1
+			;;
 		simple)
 			simple_set=1
 			;;
@@ -89,6 +91,7 @@ for arg in "$@" ; do
 			des_pcbc_set=1
 			des_ofb_set=1
 			des_cfb_set=1
+			des_ctr_set=1
 			simple_set=1
 			;;
 		*)
@@ -124,7 +127,7 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE \ $RED $count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 #----------------------------------------------------------------------
 count=$start_range
@@ -151,7 +154,7 @@ do
 done
 rm -rf temp
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE \ $RED $count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 #----------------------------------------------------------------------
 echo "$YELLOW Test write ot file $WHITE"
@@ -181,7 +184,7 @@ do
 done
 rm -rf file_1 file_2
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE \ $RED $count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 #----------------------------------------------------------------------
 echo "$YELLOW Test decoding $WHITE"
@@ -208,7 +211,7 @@ do
 	let count=$count+1
 done
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE \ $RED $count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 #----------------------------------------------------------------------
 echo "$YELLOW Test decoding and write to file $WHITE"
@@ -237,7 +240,7 @@ do
 done
 rm -rf file_1
 echo $CLEAR_LINE
-echo "$GREEN \t$count_ok OK $WHITE \ $RED $count_error KO $WHITE"
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
 fi
 
@@ -930,7 +933,6 @@ done
 echo $CLEAR_LINE
 echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
 
-exit
 #----------------------------------------------------------------
 count_ok=0
 count_error=0
@@ -1009,6 +1011,138 @@ do
 	iv=$(echo $salt | md5)
 	one=$(echo $str | ./ft_ssl des-cfb -e -s $salt -p $pas -v $iv -o /tmp/file -a) 
 	two=$(			  ./ft_ssl des-cfb -d -s $salt -p $pas -v $iv -i /tmp/file -a)
+	if [ "$str" = "$two" ]
+	then
+		echo "   " $CLEAR_LINE
+		echo "$GREEN $count OK $RESET\r\c"
+		let count_ok=$count_ok+1
+	else
+		echo $CLEAR_LINE
+		echo "$RED $count KO $RESET" ; echo "## string: " 
+		echo "[$str]"
+		echo "{$two}"
+		let count_error=$count_error+1
+	fi
+	let count=$count+1
+done
+echo $CLEAR_LINE
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+fi
+
+#---------------------------- DES-CRT ---------------------------
+#----------------------------------------------------------------
+
+if [[ $des_ctr_set -eq 1 ]] ; then
+count_ok=0
+count_error=0
+
+count=$start_range
+
+echo "$MAGENTA Test DES-CTR mod $WHITE"
+echo "$YELLOW Test encoding-decoding -k (key) -v (vect) $WHITE"
+while [[ count -lt end_range ]]
+do
+	str=$(cat /dev/random | base64 | head -c $count )
+	key=$(echo $str | md5)
+	iv=$(echo $key | md5)
+	one=$(echo $str | ./ft_ssl des-ctr -e -k $key -v $iv -o /tmp/file)
+	two=$(			  ./ft_ssl des-ctr -d -k $key -v $iv -i /tmp/file)
+	if [ "$str" = "$two" ]
+	then
+		echo "   " $CLEAR_LINE
+		echo "$GREEN $count OK $RESET\r\c"
+		let count_ok=$count_ok+1
+	else
+		echo $CLEAR_LINE
+		echo "$RED $count KO $RESET" ; echo "## string: " 
+		echo "($one)"
+		echo "[$str]"
+		echo "{$two}"
+		let count_error=$count_error+1
+	fi
+	let count=$count+1
+done
+echo $CLEAR_LINE
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+
+#----------------------------------------------------------------
+count_ok=0
+count_error=0
+
+count=$start_range
+
+echo "$YELLOW Test encoding-decoding -a (base64) -v (vect) $WHITE"
+while [[ count -lt end_range ]]
+do
+	str=$(cat /dev/random | base64 | head -c $count )
+	key=$(echo $str | md5)
+	iv=$(echo $key | md5)
+	one=$(echo $str | ./ft_ssl des-ctr -e -k $key -v $iv -o /tmp/file -a) 
+	two=$(			  ./ft_ssl des-ctr -d -k $key -v $iv -i /tmp/file -a)
+	if [ "$str" = "$two" ]
+	then
+		echo "   " $CLEAR_LINE
+		echo "$GREEN $count OK $RESET\r\c"
+		let count_ok=$count_ok+1
+	else
+		echo $CLEAR_LINE
+		echo "$RED $count KO $RESET" ; echo "## string: " 
+		echo "($one)"
+		echo "[$str]"
+		echo "{$two}"
+		let count_error=$count_error+1
+	fi
+	let count=$count+1
+done
+echo $CLEAR_LINE
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+
+#----------------------------------------------------------------
+count_ok=0
+count_error=0
+
+count=$start_range
+
+echo "$YELLOW Test encoding-decoding -a (base64) -p (password) -v (vec) $WHITE"
+while [[ count -lt end_range ]]
+do
+	str=$(cat /dev/random | base64 | head -c $count )
+	pass=$(cat /dev/random | base64 | head -c 64 )
+	iv=$(echo $salt | md5)
+	one=$(echo $str | ./ft_ssl des-ctr -e -p $pass -v $iv -o /tmp/file -a) 
+	two=$(			  ./ft_ssl des-ctr -d -p $pass -v $iv -i /tmp/file -a)
+	if [ "$str" = "$two" ]
+	then
+		echo "   " $CLEAR_LINE
+		echo "$GREEN $count OK $RESET\r\c"
+		let count_ok=$count_ok+1
+	else
+		echo $CLEAR_LINE
+		echo "$RED $count KO $RESET" ; echo "## string: " 
+		echo "[$str]"
+		echo "{$two}"
+		let count_error=$count_error+1
+	fi
+	let count=$count+1
+done
+echo $CLEAR_LINE
+echo "$GREEN \t$count_ok OK $WHITE / $RED $count_error KO $WHITE"
+
+#----------------------------------------------------------------
+count_ok=0
+count_error=0
+
+count=$start_range
+
+echo "$YELLOW Test encoding-decoding -s (salt) -p (password) -v (vect) $WHITE"
+while [[ count -lt end_range ]]
+do
+	str=$(cat /dev/random | base64 | head -c $count )
+	salt=$(echo $str | md5)
+	pas=$(cat /dev/random | base64 | head -c 64 )
+	iv=$(echo $salt | md5)
+	one=$(echo $str | ./ft_ssl des-ctr -e -s $salt -p $pas -v $iv -o /tmp/file -a) 
+	two=$(			  ./ft_ssl des-ctr -d -s $salt -p $pas -v $iv -i /tmp/file -a)
 	if [ "$str" = "$two" ]
 	then
 		echo "   " $CLEAR_LINE

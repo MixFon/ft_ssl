@@ -60,6 +60,7 @@ t_type	*get_type_programm(void)
 		{type_des, "des-pcbc"},
 		{type_des, "des-ofb"},
 		{type_des, "des-cfb"},
+		{type_des, "des-ctr"},
 		{type_des, "simple"},
 		{0, 0}
 	};
