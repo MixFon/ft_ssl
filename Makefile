@@ -6,7 +6,7 @@
 #    By: widraugr <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/29 13:07:44 by widraugr          #+#    #+#              #
-#    Updated: 2021/08/11 14:22:57 by mixfon           ###   ########.fr        #
+#    Updated: 2021/08/14 10:07:54 by mixfon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,11 +30,29 @@ FILE_SHA256 = alg_sha256.c\
 			  init_arr_k_sha256.c\
 			  mix_data.c
 
-FILE_BASE64 = base64.c
+FILE_BASE64 = fill_plaintext.c\
+			  init_base64.c\
+			  output_in_file.c\
+			  print_usage_base64.c\
+			  working_file_base64.c
 
-FILE_DES = des.c
+FILE_DES = determining_operating_mode.c\
+		   fill_key.c\
+		   function_ip.c\
+		   function_ip_final.c\
+		   generate_kays.c\
+		   generate_random64.c\
+		   get_hex_char_source.c\
+		   get_ip_final.c\
+		   get_pc1.c\
+		   init_des.c\
+		   mode_des_cbc.c\
+		   mode_simple.c\
+		   print_error_des.c\
+		   write_to_output_file.c
 
-FILE_HMAC = hmac.c
+FILE_HMAC = get_hash_md5.c\
+			hmac_md5.c
 
 #FLAGS = -g -Wall -Wextra -Werror -I libft -I include 
 FLAGS = -g -I libft -I include 

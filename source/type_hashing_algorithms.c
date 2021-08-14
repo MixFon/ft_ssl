@@ -1,4 +1,3 @@
-
 #include "../include/ft_ssl.h"
 
 /*

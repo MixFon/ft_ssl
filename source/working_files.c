@@ -64,7 +64,7 @@ t_type	*get_type_programm(void)
 		{type_des, "simple"},
 		{0, 0}
 	};
-	
+
 	return (type_programm);
 }
 

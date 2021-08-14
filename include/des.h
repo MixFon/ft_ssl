@@ -9,9 +9,9 @@
 
 # define KDLEN 8
 
-typedef struct s_des t_des;
+typedef struct s_des	t_des;
 
-typedef struct 	s_mode
+typedef struct s_mode
 {
 	void		(*operating_mode)(t_des *des);
 	const char	*mode_name;
@@ -108,6 +108,117 @@ static const uint8_t	g_s[8][4][16] = {
 	}
 };
 
-void	type_des(int ac, const char **av);
+void		type_des(int ac, const char **av);
+/*
+** File init_des.c
+*/
+void		init_des(t_des *des);
+void		print_usage_des(void);
+int			is_hex_string(const char *str);
+void		check_count_arguments(int i, int ac, const char **av);
+void		print_error_hex_string(const char *str);
+/*
+** File get_hex_char_source.c
+*/
+int			get_hex_char_source(const char c);
+int			get_hex_char(const char c);
+uint64_t	convert_string_to_hex_number(const char *str);
+void		fill_uint64_t_des(uint64_t *number, int ac,
+				const char **av, int *i);
+void		fill_string_des(char **str, int ac, const char **av, int *i);
+/*
+** File print_error_des.c
+*/
+void		print_error_des(const char *str);
+void		set_fags_with_string(t_des *des, int ac, const char **av, int *i);
+void		set_flag_des(t_des *des, int ac, const char **av, int *i);
+void		read_flags_des(t_des *des, int ac, const char **av);
+void		deinit_des(t_des *des);
+/*
+** File generate_random64.c
+*/
+void		generate_random64(uint64_t *salt);
+void		read_password(t_des *des);
+t_uchar		*first_step(char *password, const uint64_t salt_num);
+void		xor(t_uchar *result, t_uchar *u);
+uint64_t	string_to_uinit64(uint8_t *message);
+/*
+** File fill_key.c
+*/
+void		fill_key(t_des *des, t_uchar *result);
+void		pbkdf(t_des *des);
+void		generate_init_vector(t_des *des);
+void		read_salt_from_input_massage(t_des *des);
+void		generate_key(t_des *des);
+/*
+** File get_pc1.c
+*/
+uint8_t		*get_pc1(void);
+uint8_t		*get_pc2(void);
+uint8_t		*get_ip(void);
+uint8_t		*get_e(void);
+uint8_t		*get_p(void);
+/*
+** File get_ip_final.c
+*/
+uint8_t		*get_ip_final(void);
+uint8_t		*count_shift(void);
+void		shift_to_left_28(uint32_t *c, uint32_t *d, int round);
+void		working_pc1(t_des *des);
+void		working_pc2(t_des *des, int i);
+/*
+** File generate_kays.c
+*/
+void		generate_kays(t_des *des);
+void		resize_message(t_des *des);
+void		working_file_des(t_des *des);
+void		working_input_des(t_des *des);
+void		get_message(t_des *des);
+/*
+** File function_ip.c
+*/
+uint64_t	function_ip(uint64_t block);
+uint64_t	function_e(uint32_t right);
+uint8_t		get_number_s(uint64_t val, int i);
+uint32_t	function_p(uint32_t val);
+uint32_t	function_f(uint32_t right, uint64_t key);
+/*
+** File function_ip_final.c
+*/
+uint64_t	function_ip_final(uint64_t block);
+void		write_uint64_to_output_message(t_des *des,
+				uint64_t block, size_t i);
+uint64_t	get_kye(t_des *des, int i);
+uint64_t	function_des(t_des *des, uint64_t block64);
+void		decode_base64(t_des *des);
+/*
+** File mode_simple.c
+*/
+void		mode_simple(t_des *des);
+void		mode_des_crt(t_des *des);
+void		mode_des_cfb(t_des *des);
+void		mode_des_ofb(t_des *des);
+void		mode_des_pcbc(t_des *des);
+/*
+** File mode_des_cbc.c
+*/
+void		mode_des_cbc(t_des *des);
+void		mode_des_ecb(t_des *des);
+void		mode_des3(t_des *des);
+void		skip_16_octets(t_des *des);
+void		run_des(t_des *des);
+/*
+** File write_to_output_file.c
+*/
+void		write_to_output_file(t_des *des);
+void		encode_base64(t_des *des);
+void		add_salt_to_output_message(t_des *des);
+void		write_output_message(t_des *des);
+t_mode		*get_modes(void);
+/*
+** File determining_operating_mode.c
+*/
+void		determining_operating_mode(t_des *des, const char **av);
+void		type_des(int ac, const char **av);
 
 #endif
