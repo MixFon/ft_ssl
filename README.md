@@ -12,3 +12,10 @@
 * simple
 
 Так же реализованы алгоритмы хеширования md5 и sha256
+
+## Использование
+    git clone https://github.com/MixFon/ft_ssl.git
+    cd ft_ssl
+    git clone https://github.com/MixFon/libft.git libft
+    make
+    
