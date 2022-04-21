@@ -55,6 +55,9 @@ void	set_flag(t_base64 *base, int ac, const char **av, int *i)
 		print_error_base64(&av[*i][1]);
 }
 
+/*
+** Обработка аргументов командной строки. Чтение флагов
+*/
 void	read_flags(t_base64 *base, int ac, const char **av)
 {
 	int	i;

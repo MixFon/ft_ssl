@@ -27,6 +27,7 @@ void	encoding(t_base64 *base, char *data, size_t size)
 	equal = 0;
 	if (size % 3 != 0)
 		equal = 3 - (size % 3);
+	// base->chiphertext = new char[size + size / 3 + 3];
 	base->chiphertext = ft_strnew(size + size / 3 + 3);
 	resize_data(&data, &size);
 	while (i < size)
@@ -41,6 +42,7 @@ void	encoding(t_base64 *base, char *data, size_t size)
 	}
 	while (equal > 0)
 		base->chiphertext[size + size / 3 - equal--] = '=';
+	// delete[] data
 	free(data);
 }
 
@@ -70,6 +72,7 @@ void	decoding(t_base64 *base, char *data, size_t size)
 	char	indexes[3];
 
 	i = 0;
+	// base->chiphertext = new char[size];
 	base->chiphertext = ft_strnew(size);
 	while (i < size)
 	{
@@ -82,6 +85,7 @@ void	decoding(t_base64 *base, char *data, size_t size)
 		fill_plaintext(base, indexes);
 		i += 4;
 	}
+	// delete[] data
 	free(data);
 }
 
